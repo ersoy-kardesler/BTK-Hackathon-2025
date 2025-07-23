@@ -1,0 +1,66 @@
+# Byte-derlenmiş dosyalar
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# İşletim sistemi dosyaları
+.DS_Store
+Thumbs.db
+
+# Sanal ortamlar
+venv/
+env/
+/bin
+/include
+/lib
+/lib64
+/share
+/.Python
+debug.log
+.venv/
+.conda/
+pip-log.txt
+pip-delete-this-arg.txt
+
+# Çekirdek ve günlük dosyaları
+*.sqlite3
+*.log
+*.pot
+*.mo
+
+# Editör/IDE dosyaları
+.idea/
+.vscode/
+*.swp
+*.bak
+*~
+.sess
+.history
+
+# Test ve kapsama raporları
+.coverage
+.tox/
+htmlcov/
+.pytest_cache/
+
+# Veri dosyaları
+*.csv
+*.xls
+*.xlsx
+*.json
+*.sqlite
+*.db
+
+# Çıktı ve derleme dosyaları
+dist/
+build/
+*.egg-info/
+
+# Diğer yaygın dosyalar
+.env
+.flaskenv
+instance/
+
+# Jupyter Notebook dosyaları
+.ipynb_checkpoints/
