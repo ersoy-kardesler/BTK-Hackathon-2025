@@ -82,12 +82,13 @@ BTK-Hackathon-2025/
 ├── app.py                 # Ana Flask uygulaması ve backend fonksiyonları
 ├── gemini_api_test.py     # Backend fonksiyon test scripti
 ├── requirements.txt       # Python bağımlılıkları
-├── README.md             # Bu dosya
+├── README.md              # Bu dosya
+├── .gitignore             # Git için dışlanma dosyası
 ├── templates/
-│   └── index.html        # Ana sayfa
+│   └── index.html         # Ana sayfa
 └── static/
     └── css/
-        └── style.css     # CSS stilleri
+        └── style.css      # CSS stilleri
 ```
 
 ## 🔒 Güvenlik
@@ -102,6 +103,6 @@ BTK-Hackathon-2025/
 
 ## 📝 Lisans
 
-Telif Hakkı (c) 2025 Ercan Ersoy, Erdem Ersoy
+Telif Hakkı © 2025 Ercan Ersoy, Erdem Ersoy
 
 Bütün hakları saklıdır.
