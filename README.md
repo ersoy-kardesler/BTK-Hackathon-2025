@@ -11,13 +11,6 @@ Bu proje, Google Gemini AI entegrasyonu ile eğitim içerikleri oluşturabilen b
 - **Müfredat Oluşturucu**: İnteraktif form ile müfredat hazırlama
 - **Responsive Tasarım**: Mobil ve masaüstü uyumlu arayüz
 
-### Backend API
-
-- **generate_curriculum()**: Belirtilen konu, seviye ve süreye göre detaylı eğitim müfredatı oluşturur
-- **generate_lesson_plan()**: Herhangi bir konu için interaktif ders planları hazırlar
-- **generate_quiz()**: Konulara özel çoktan seçmeli quiz soruları üretir
-- **evaluate_assignment()**: Öğrenci ödevlerini otomatik olarak değerlendirir
-
 ## 📋 Gereksinimler
 
 - Python 3.8+
