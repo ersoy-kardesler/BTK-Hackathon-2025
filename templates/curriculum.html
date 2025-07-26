@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Müfredat Oluştur</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Müfredat Oluştur</h1>
+        <p>Yapay zeka ile otomatik müfredat oluşturun.</p>
+        <form method="post">
+            <input type="text" name="subject" placeholder="Ders Adı" required style="width:100%;padding:10px;margin-bottom:16px;">
+            <button type="submit" class="btn">Oluştur</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
+    </div>
+</body>
+</html>

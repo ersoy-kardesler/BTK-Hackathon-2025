@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <h1>Eğitim Yönetim Sistemi</h1>
+    <div class="container">
+        <h1>Eğitim Yönetim Sistemi</h1>
+        <p>Yapay zeka destekli içerik üretimi ve değerlendirme aracı</p>
+        <div class="button-group">
+            <a href="{{ url_for('curriculum') }}" class="btn">Müfredat Oluştur</a>
+            <a href="{{ url_for('lesson_plan') }}" class="btn">Ders Planı Oluştur</a>
+            <a href="{{ url_for('quiz') }}" class="btn">Quiz Oluştur</a>
+            <a href="{{ url_for('assignment_evaluate') }}" class="btn">Ödev Değerlendir</a>
+        </div>
+    </div>
 </body>
 </html>

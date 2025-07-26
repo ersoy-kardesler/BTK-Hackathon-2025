@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödev Değerlendir</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Ödev Değerlendir</h1>
+        <p>Yapay zeka ile ödevleri otomatik değerlendirin.</p>
+        <form method="post">
+            <textarea name="assignment_text" placeholder="Ödev metnini girin" required style="width:100%;padding:10px;height:100px;margin-bottom:16px;"></textarea>
+            <button type="submit" class="btn">Değerlendir</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
+    </div>
+</body>
+</html>
