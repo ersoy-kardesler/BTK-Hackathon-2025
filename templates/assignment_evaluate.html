@@ -10,11 +10,44 @@
     <div class="container">
         <h1>Ödev Değerlendir</h1>
         <p>Yapay zeka ile ödevleri otomatik değerlendirin.</p>
-        <form method="post">
-            <textarea name="assignment_text" placeholder="Ödev metnini girin" required style="width:100%;padding:10px;height:100px;margin-bottom:16px;"></textarea>
+        <div id="alert-area"></div>
+        <form id="assignment-form" autocomplete="off">
+            <textarea name="assignment_text" id="assignment_text" placeholder="Ödev metnini girin" required style="height:100px;"></textarea>
+            <input type="text" name="criteria" id="criteria" placeholder="Değerlendirme kriteri (örn: Anlatım, içerik, özgünlük...)" required>
             <button type="submit" class="btn">Değerlendir</button>
         </form>
+        <div id="evaluation-result" style="margin-top:24px;"></div>
         <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
     </div>
+    <script>
+    document.getElementById('assignment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const assignment_text = document.getElementById('assignment_text').value.trim();
+        const criteria = document.getElementById('criteria').value.trim();
+        const alertArea = document.getElementById('alert-area');
+        const resultDiv = document.getElementById('evaluation-result');
+        alertArea.innerHTML = '';
+        resultDiv.innerHTML = '';
+        if (!assignment_text || !criteria) {
+            alertArea.innerHTML = '<div class="alert error">Tüm alanları doldurun.</div>';
+            return;
+        }
+        try {
+            const response = await fetch('/api/assignment_evaluate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ assignment_text, criteria })
+            });
+            const data = await response.json();
+            if (data.success) {
+                resultDiv.innerHTML = `<div class='alert success'>Değerlendirme Sonucu:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${data.evaluation}</pre>`;
+            } else {
+                alertArea.innerHTML = `<div class='alert error'>${data.error || 'Bilinmeyen bir hata oluştu.'}</div>`;
+            }
+        } catch (err) {
+            alertArea.innerHTML = `<div class='alert error'>Sunucuya bağlanılamadı.</div>`;
+        }
+    });
+    </script>
 </body>
 </html>

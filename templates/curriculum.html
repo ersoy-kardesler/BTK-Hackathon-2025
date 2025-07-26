@@ -9,12 +9,48 @@
 <body>
     <div class="container">
         <h1>Müfredat Oluştur</h1>
-        <p>Yapay zeka ile otomatik müfredat oluşturun.</p>
-        <form method="post">
-            <input type="text" name="subject" placeholder="Ders Adı" required style="width:100%;padding:10px;margin-bottom:16px;">
-            <button type="submit" class="btn">Oluştur</button>
-        </form>
+        <p>Yapay zeka ile otomatik ve detaylı müfredat, ders planı ve quiz soruları oluşturun.</p>
+        <div id="alert-area"></div>
+        <div id="curriculum-form">
+            <input type="text" id="subject" placeholder="Ders Adı (örn: Python Programlama)" required>
+            <button id="generate-btn" class="btn">Müfredat Oluştur</button>
+        </div>
+        <div id="curriculum-result" style="margin-top:24px;"></div>
         <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
     </div>
+    <script>
+    document.getElementById('generate-btn').addEventListener('click', async function(e) {
+        e.preventDefault();
+        const subject = document.getElementById('subject').value.trim();
+        const alertArea = document.getElementById('alert-area');
+        const resultDiv = document.getElementById('curriculum-result');
+        alertArea.innerHTML = '';
+        resultDiv.innerHTML = '';
+        if (!subject) {
+            alertArea.innerHTML = '<div class="alert error">Ders adı boş olamaz.</div>';
+            return;
+        }
+        try {
+            const response = await fetch('/api/curriculum', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ subject })
+            });
+            const data = await response.json();
+            if (response.ok && data.success && data.curriculum) {
+                const curriculum = data.curriculum;
+                const html = curriculum.replace(/^(\d+\.|-)[^\n]*$/gm, match => `<b style='color:#2a5d9f;'>${match}</b>`)
+                    .replace(/^(Soru:|Cevap:)/gm, match => `<span style='color:#1a3e7e;font-weight:bold;'>${match}</span>`);
+                resultDiv.innerHTML = `<div class='alert success'><b>${data.subject}</b> için oluşturulan müfredat:</div><div style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;font-size:1.01rem;'>${html}</div>`;
+            } else if (data && data.error) {
+                alertArea.innerHTML = `<div class='alert error'>${data.error}</div>`;
+            } else {
+                alertArea.innerHTML = `<div class='alert error'>Sunucudan geçersiz veri alındı.</div>`;
+            }
+        } catch (err) {
+            alertArea.innerHTML = `<div class='alert error'>Sunucuya bağlanılamadı: ${err.message}</div>`;
+        }
+    });
+    </script>
 </body>
 </html>

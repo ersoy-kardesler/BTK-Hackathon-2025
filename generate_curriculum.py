@@ -37,5 +37,7 @@ def generate_curriculum(subject, duration="14 hafta", lesson_duration=60, questi
         print("\n✅ İçerikler oluşturuldu!\n")
         print(response)
 
+        return response
+
     except Exception as e:
         print(f"❌ Hata oluştu: {str(e)}")
