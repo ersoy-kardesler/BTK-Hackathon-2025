@@ -21,7 +21,7 @@ Yazarlar: Ersoy Kardeşler
 Tarih: Temmuz 2025
 """
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
 import google.generativeai as genai
 import os
@@ -75,43 +75,93 @@ def index():
     return render_template("index.html")
 
 
-# Müfredat oluşturma sayfası (GET ve POST)
-@app.route("/curriculum", methods=["GET", "POST"])
+# Müfredat oluşturma sayfası (GET)
+@app.route("/curriculum", methods=["GET"])
 def curriculum():
     """
-    Müfredat oluşturma ve oluşturulan müfredatı gösterme sayfası.
-    GET: Formu gösterir.
-    POST: Formdan gelen subject ile müfredat oluşturur ve sonucu gösterir.
+    Müfredat oluşturma sayfası - Formu gösterir.
     """
-    curriculum_result = None
-    error = None
-    if request.method == "POST":
-        subject = request.form.get("subject", "").strip()
-        if subject:
-            curriculum_result = generate_curriculum(subject, model=model)
-        else:
-            error = "Ders adı boş olamaz."
-    return render_template("curriculum.html", curriculum_result=curriculum_result, error=error)
+    return render_template("curriculum.html")
 
 
-# Ödev değerlendirme sayfası (GET ve POST)
-@app.route("/assignment_evaluate", methods=["GET", "POST"])
+# Müfredat oluşturma API endpoint (POST)
+@app.route("/api/curriculum", methods=["POST"])
+def api_curriculum():
+    """
+    Müfredat oluşturma API endpoint'i.
+    JSON formatında subject alır ve müfredat oluşturur.
+    """
+    try:
+        # JSON verisini al
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "JSON verisi bulunamadı"}), 400
+
+        subject = data.get("subject", "").strip()
+        if not subject:
+            return jsonify({"error": "Ders adı boş olamaz"}), 400
+
+        # Müfredat oluştur
+        curriculum_result = generate_curriculum(subject, model=model)
+
+        return jsonify({
+            "success": True,
+            "curriculum": curriculum_result,
+            "subject": subject
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Müfredat oluşturulurken hata oluştu: {str(e)}"
+        }), 500
+
+
+# Ödev değerlendirme sayfası (GET)
+@app.route("/assignment_evaluate", methods=["GET"])
 def assignment_evaluate():
     """
-    Ödev değerlendirme ve sonucu gösterme sayfası.
-    GET: Formu gösterir.
-    POST: Formdan gelen assignment_text ve criteria ile değerlendirme yapar ve sonucu gösterir.
+    Ödev değerlendirme sayfası - Formu gösterir.
     """
-    evaluation_result = None
-    error = None
-    if request.method == "POST":
-        assignment_text = request.form.get("assignment_text", "").strip()
-        criteria = request.form.get("criteria", "").strip()
-        if assignment_text and criteria:
-            evaluation_result = evaluate_assignment(assignment_text, criteria, model=model)
-        else:
-            error = "Ödev metni ve değerlendirme kriteri boş olamaz."
-    return render_template("assignment_evaluate.html", evaluation_result=evaluation_result, error=error)
+    return render_template("assignment_evaluate.html")
+
+
+# Ödev değerlendirme API endpoint (POST)
+@app.route("/api/assignment_evaluate", methods=["POST"])
+def api_assignment_evaluate():
+    """
+    Ödev değerlendirme API endpoint'i.
+    JSON formatında assignment_text ve criteria alır ve değerlendirme yapar.
+    """
+    try:
+        # JSON verisini al
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "JSON verisi bulunamadı"}), 400
+
+        assignment_text = data.get("assignment_text", "").strip()
+        criteria = data.get("criteria", "").strip()
+
+        if not assignment_text:
+            return jsonify({"error": "Ödev metni boş olamaz"}), 400
+        if not criteria:
+            return jsonify({"error": "Değerlendirme kriteri boş olamaz"}), 400
+
+        # Ödev değerlendirmesi yap
+        evaluation_result = evaluate_assignment(assignment_text, criteria, model=model)
+
+        return jsonify({
+            "success": True,
+            "evaluation": evaluation_result,
+            "assignment_text": assignment_text,
+            "criteria": criteria
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Ödev değerlendirilirken hata oluştu: {str(e)}"
+        }), 500
 
 # Uygulamayı çalıştır
 if __name__ == "__main__":
