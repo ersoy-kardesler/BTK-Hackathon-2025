@@ -4,7 +4,7 @@ BTK Hackathon 2025 - Eğitim Asistanı Uygulaması
 Bu uygulama, Google Gemini AI kullanarak eğitim içeriği oluşturan
 bir Flask web uygulamasıdır.
 Özellikler:
-- Müfredat oluşturma
+- Eğitim oluşturma
 - Ödev değerlendirme
 
 Gereksinimler:
@@ -27,8 +27,9 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
+
 # Fonksiyonları ayrı dosyalardan import et
-from generate_curriculum import generate_curriculum
+from generate_education import generate_education
 from evaluate_assignment import evaluate_assignment
 
 # .env dosyasından çevre değişkenlerini yükle
@@ -76,21 +77,21 @@ def index():
     return render_template("index.html")
 
 
-# Müfredat oluşturma sayfası (GET)
-@app.route("/curriculum", methods=["GET"])
-def curriculum():
+# Eğitim oluşturma sayfası (GET)
+@app.route("/education", methods=["GET"])
+def education():
     """
-    Müfredat oluşturma sayfası - Formu gösterir.
+    Eğitim oluşturma sayfası - Formu gösterir.
     """
-    return render_template("curriculum.html")
+    return render_template("education.html")
 
 
-# Müfredat oluşturma API endpoint (POST)
-@app.route("/api/curriculum", methods=["POST"])
-def api_curriculum():
+# Eğitim oluşturma API endpoint (POST)
+@app.route("/api/education", methods=["POST"])
+def api_education():
     """
-    Müfredat oluşturma API endpoint'i.
-    JSON formatında subject alır ve müfredat oluşturur.
+    Eğitim oluşturma API endpoint'i.
+    JSON formatında bilgi alır ve eğitim oluşturur.
     """
     try:
         # JSON verisini al
@@ -102,19 +103,18 @@ def api_curriculum():
         if not subject:
             return jsonify({"error": "Ders adı boş olamaz"}), 400
 
-        # Müfredat oluştur
-        curriculum_result = generate_curriculum(subject, model=model)
+        # Eğitim oluştur
+        education_result = generate_education(subject, model=model)
 
         return jsonify({
             "success": True,
-            "curriculum": curriculum_result,
+            "education": education_result,
             "subject": subject
         })
-
     except Exception as e:
         return jsonify({
             "success": False,
-            "error": f"Müfredat oluşturulurken hata oluştu: {str(e)}"
+            "error": f"Eğitim oluşturulurken hata oluştu: {str(e)}"
         }), 500
 
 
@@ -159,7 +159,6 @@ def api_assignment_evaluate():
             "assignment_text": assignment_text,
             "criteria": criteria
         })
-
     except Exception as e:
         return jsonify({
             "success": False,

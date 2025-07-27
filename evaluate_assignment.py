@@ -7,6 +7,7 @@ Bütün hakları saklıdır.
 Bu dosya, Gemini API kullanarak ödev değerlendirir.
 """
 
+
 # Ödevi değerlendiren fonksiyon
 def evaluate_assignment(assignment_text,
                         criteria="Genel değerlendirme kriterleri",
@@ -17,50 +18,50 @@ def evaluate_assignment(assignment_text,
     """
     if not assignment_text.strip():
         return "Hata: Ödev metni boş olamaz." \
-                "Lütfen değerlendirilecek içeriği girin."
+            "Lütfen değerlendirilecek içeriği girin."
     if len(assignment_text) < 10:
         return "Uyarı: Çok kısa ödev metni." \
-               "Detaylı değerlendirme için daha uzun içerik önerilir."
+            "Detaylı değerlendirme için daha uzun içerik önerilir."
 
     prompt = f"""
-    Aşağıdaki öğrenci ödevini eğitici ve yapıcı bir şekilde değerlendir:
+Aşağıdaki öğrenci ödevini eğitici ve yapıcı bir şekilde değerlendir:
 
-    === ÖDEV İÇERİĞİ ===
-    {assignment_text}
+=== ÖDEV İÇERİĞİ ===
+{assignment_text}
 
-    === DEĞERLENDİRME KRİTERLERİ ===
-    {criteria}
+=== DEĞERLENDİRME KRİTERLERİ ===
+{criteria}
 
-    === DEĞERLENDİRME RAPORU ===
-    Lütfen aşağıdaki format kullanarak detaylı değerlendirme yap:
+=== DEĞERLENDİRME RAPORU ===
+Lütfen aşağıdaki format kullanarak detaylı değerlendirme yap:
 
-    🎯 GENEL DEĞERLENDİRME
-    Puan: [X]/100
-    Genel Görüş: [Kısa özet değerlendirme]
+🎯 GENEL DEĞERLENDİRME
+Puan: [X]/100
+Genel Görüş: [Kısa özet değerlendirme]
 
-    ✅ GÜÇLÜ YÖNLER
-    - [Başarılı olan noktalar]
-    - [Doğru yaklaşımlar]
-    - [İyi uygulamalar]
+✅ GÜÇLÜ YÖNLER
+- [Başarılı olan noktalar]
+- [Doğru yaklaşımlar]
+- [İyi uygulamalar]
 
-    📈 GELİŞTİRİLEBİLİR ALANLAR
-    - [Eksik olan noktalar]
-    - [Hatalı yaklaşımlar]
-    - [İyileştirilebilir alanlar]
+📈 GELİŞTİRİLEBİLİR ALANLAR
+- [Eksik olan noktalar]
+- [Hatalı yaklaşımlar]
+- [İyileştirilebilir alanlar]
 
-    💡 ÖNERİLER VE REHBERLIK
-    - [Somut iyileştirme önerileri]
-    - [Alternatif yaklaşımlar]
-    - [Ek kaynak önerileri]
+💡 ÖNERİLER VE REHBERLIK
+- [Somut iyileştirme önerileri]
+- [Alternatif yaklaşımlar]
+- [Ek kaynak önerileri]
 
-    📝 DETAYLI GERİ BİLDİRİM
-    [Satır satır veya bölüm bölüm detaylı analiz]
+📝 DETAYLI GERİ BİLDİRİM
+[Satır satır veya bölüm bölüm detaylı analiz]
 
-    🎯 SONUÇ VE ÖZET
-    [Öğrencinin gelişimi için somut adımlar]
+🎯 SONUÇ VE ÖZET
+[Öğrencinin gelişimi için somut adımlar]
 
-    Değerlendirme Türkçe, eğitici, yapıcı ve motive edici olmalı.
-    Öğrencinin moralini bozmadan gelişim alanlarını belirt.
+Değerlendirme Türkçe, eğitici, yapıcı ve motive edici olmalı.
+Öğrencinin moralini bozmadan gelişim alanlarını belirt.
     """
     try:
         response = model.generate_content(prompt).text

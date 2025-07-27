@@ -112,3 +112,7 @@ instance/
 
 # Jupyter Notebook dosyaları
 .ipynb_checkpoints/
+
+# Uygulama tanımlı
+test/*
+!test/README.txt

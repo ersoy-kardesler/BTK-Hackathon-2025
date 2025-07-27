@@ -1,13 +1,13 @@
 """
-BTK Hackathon 2025 - Müfredat Oluşturma Sınama Uygulaması
+BTK Hackathon 2025 - Eğitim Oluşturma Sınama Uygulaması
 
 Telif Hakkı © 2025 Ersoy Kardeşler
 Bütün hakları saklıdır.
 
-Bu dosya, müfredat oluşturmayı sınar.
+Bu dosya, eğitim oluşturmayı sınar.
 
 Kullanım:
-    python test_generating_curriculum.py
+    python test_generating_education.py
 
 Gereksinimler:
 - Ortam değişkenlerinde GEMINI_API_KEY tanımlı olmalı
@@ -17,11 +17,12 @@ Gereksinimler:
 Yazarlar: Ersoy Kardeşler
 """
 
+
 # Gerekli kütüphanelerin içe aktarılması
 import os
 import google.generativeai as genai
 
-from generate_curriculum import generate_curriculum
+from generate_education import generate_education
 from dotenv import load_dotenv
 
 
@@ -55,7 +56,7 @@ def test_generate_all():
     """
 
     # Başlığı yaz
-    print("Müfredat Oluşturma Sınaması Başlatılıyor...")
+    print("Eğitim Oluşturma Sınaması Başlatılıyor...")
     print("=" * 60)
 
     # Modeli al
@@ -68,11 +69,18 @@ def test_generate_all():
     question_count = 10
 
     # generate_all fonksiyonunu çağır
-    return generate_curriculum(subject,
-                               duration,
-                               lesson_duration,
-                               question_count,
-                               model=model)
+    response = generate_education(subject,
+                                  duration,
+                                  lesson_duration,
+                                  question_count,
+                                  model=model)
+
+    # Sınama sonucunu dosyaya yaz
+    with open("test/education.txt", "w", encoding="utf-8") as f:
+        f.write(response)
+
+    # Sınama sonucunu döndür
+    return response
 
 
 # Uygulamayı çalıştır
@@ -83,7 +91,7 @@ if __name__ == "__main__":
     """
 
     # Başlığı yaz
-    print("BTK Hackathon 2025 - Müfredat Oluşturma Sınaması (Tüm İçerikler)")
+    print("BTK Hackathon 2025 - Eğitim Oluşturma Sınaması (Tüm İçerikler)")
     print("=" * 60)
     print("Geliştirici: Ersoy Kardeşler")
     print("=" * 60)
