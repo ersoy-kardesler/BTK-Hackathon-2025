@@ -1,3 +1,13 @@
+"""
+BTK Hackathon 2025 - Gemini API ile Müfredat Oluşturma Kaynak Kodları
+
+Telif Hakkı © 2025 Ersoy Kardeşler
+Bütün hakları saklıdır.
+
+Bu dosya, Gemini API kullanarak müfredat oluşturmayı sınar.
+"""
+
+
 # Müfredatı oluşturan fonksiyon
 def generate_curriculum(subject,
                         duration="14 hafta",

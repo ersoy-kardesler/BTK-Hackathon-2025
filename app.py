@@ -19,7 +19,6 @@ Kullanım:
 3. python app.py ile uygulamayı başlatın
 
 Yazarlar: Ersoy Kardeşler
-Tarih: Temmuz 2025
 """
 
 from flask import Flask, render_template, request, jsonify
@@ -184,7 +183,6 @@ if __name__ == "__main__":
     Production ortamında debug=False olmalıdır.
     """
     print("BTK Hackathon 2025 - Ersoy Kardeşler")
-    print("Uygulama URL: http://127.0.0.1:5000")
     print("Durdurmak için Ctrl+C tuşlayın")
 
     # Flask development server'ı başlat

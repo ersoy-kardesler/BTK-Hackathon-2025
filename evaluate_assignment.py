@@ -1,3 +1,13 @@
+"""
+BTK Hackathon 2025 - Gemini API ile Müfredat Oluşturma Kaynak Kodları
+
+Telif Hakkı © 2025 Ersoy Kardeşler
+Bütün hakları saklıdır.
+
+Bu dosya, Gemini API kullanarak müfredat oluşturmayı sınar.
+"""
+
+# Ödevi değerlendiren fonksiyon
 def evaluate_assignment(assignment_text,
                         criteria="Genel değerlendirme kriterleri",
                         model=None):

@@ -1,5 +1,8 @@
 """
-BTK Hackathon 2025 - Google Gemini API Sınama Uygulaması
+BTK Hackathon 2025 - Müfredat Oluşturma Sınama Uygulaması
+
+Telif Hakkı © 2025 Ersoy Kardeşler
+Bütün hakları saklıdır.
 
 Bu dosya, müfredat oluşturmayı sınar.
 
@@ -7,12 +10,11 @@ Kullanım:
     python test_generating_curriculum.py
 
 Gereksinimler:
-- .env dosyasında GEMINI_API_KEY tanımlı olmalı
+- Ortam değişkenlerinde GEMINI_API_KEY tanımlı olmalı
 - app.py ile aynı dizinde bulunmalı
 - Internet bağlantısı (API çağrıları için)
 
 Yazarlar: Ersoy Kardeşler
-Tarih: Temmuz 2025
 """
 
 # Gerekli kütüphanelerin içe aktarılması
@@ -23,6 +25,7 @@ from generate_curriculum import generate_curriculum
 from dotenv import load_dotenv
 
 
+# Gemini modellerinden birini döndüren fonksiyon
 def get_gemini_model():
     """
     Google Gemini API modelini yapılandırır ve döndürür.
@@ -45,6 +48,7 @@ def get_gemini_model():
     return genai.GenerativeModel("gemini-2.5-flash")
 
 
+# generate_all fonksiyonunun sınayan fonksiyon
 def test_generate_all():
     """
     generate_all fonksiyonunu sınar ve sonuçları konsola yazdırır.
@@ -52,7 +56,7 @@ def test_generate_all():
 
     # Başlığı yaz
     print("Müfredat Oluşturma Sınaması Başlatılıyor...")
-    print("=" * 70)
+    print("=" * 60)
 
     # Modeli al
     model = get_gemini_model()
@@ -81,7 +85,6 @@ if __name__ == "__main__":
     # Başlığı yaz
     print("BTK Hackathon 2025 - Müfredat Oluşturma Sınaması (Tüm İçerikler)")
     print("=" * 60)
-    print("Sınama Tarihi:", "26 Temmuz 2025")
     print("Geliştirici: Ersoy Kardeşler")
     print("=" * 60)
     try:
