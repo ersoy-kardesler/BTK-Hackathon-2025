@@ -7,18 +7,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Ödev Değerlendir</h1>
-        <p>Yapay zeka ile ödevleri otomatik değerlendirin.</p>
-        <div id="alert-area"></div>
-        <form id="assignment-form" autocomplete="off">
-            <textarea name="assignment_text" id="assignment_text" placeholder="Ödev metnini girin" required style="height:100px;"></textarea>
-            <input type="text" name="criteria" id="criteria" placeholder="Değerlendirme kriteri (örn: Anlatım, içerik, özgünlük...)" required>
-            <button type="submit" class="btn">Değerlendir</button>
-        </form>
-        <div id="evaluation-result" style="margin-top:24px;"></div>
-        <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
-    </div>
+    <main>
+        <section class="container container-wide">
+            <h1>Ödev Değerlendir</h1>
+            <p>Yapay zeka ile ödevleri otomatik olarak değerlendirin.</p>
+            <form id="assignment-form" autocomplete="off">
+                <textarea name="assignment_text" id="assignment_text" placeholder="Ödev metnini girin" required style="height:100px;"></textarea>
+                <input type="text" name="criteria" id="criteria" placeholder="Değerlendirme kriteri (örn: Anlatım, içerik, özgünlük...)" required>
+                <button type="submit" class="btn">Değerlendir</button>
+            </form>
+            <div id="alert-area"></div>
+            <div id="evaluation-result" style="margin-top:24px;"></div>
+            <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
+        </section>
+    </main>
     <script>
     document.getElementById('assignment-form').addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -32,6 +34,8 @@
             alertArea.innerHTML = '<div class="alert error">Tüm alanları doldurun.</div>';
             return;
         }
+        // Show loading message
+        alertArea.innerHTML = '<div class="alert">Ödev değerlendiriliyor... Lütfen bekleyiniz.</div>';
         try {
             const response = await fetch('/api/assignment_evaluate', {
                 method: 'POST',
@@ -39,8 +43,10 @@
                 body: JSON.stringify({ assignment_text, criteria })
             });
             const data = await response.json();
+            alertArea.innerHTML = '';
             if (data.success) {
-                resultDiv.innerHTML = `<div class='alert success'>Değerlendirme Sonucu:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${data.evaluation}</pre>`;
+                // Remove HTML formatting, show as plain text
+                resultDiv.innerHTML = `<div class='alert success'>Değerlendirme Sonucu:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${data.evaluation.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
             } else {
                 alertArea.innerHTML = `<div class='alert error'>${data.error || 'Bilinmeyen bir hata oluştu.'}</div>`;
             }

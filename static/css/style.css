@@ -13,12 +13,20 @@ body {
     background: #fff;
     border-radius: 18px;
     box-shadow: 0 4px 24px rgba(42,93,159,0.10), 0 1.5px 4px rgba(0,0,0,0.04);
-    padding: 40px 28px 32px 28px;
+    padding: 28px 28px 24px 28px;
     text-align: center;
     transition: box-shadow 0.3s;
 }
-.container:hover {
-    box-shadow: 0 8px 32px rgba(42,93,159,0.13), 0 2px 8px rgba(0,0,0,0.06);
+.container-wide {
+    max-width: 700px;
+    padding: 32px 48px 28px 48px;
+}
+@media (max-width: 900px) {
+    .container-wide {
+        max-width: 98vw;
+        margin: 24px 2vw;
+        padding: 18px 4vw 18px 4vw;
+    }
 }
 
 h1, h2, h3 {
@@ -59,10 +67,17 @@ p {
     transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 .btn:hover, .btn:focus {
+    filter: brightness(1.15);
     background: linear-gradient(90deg, #1a3e7e 60%, #2a5d9f 100%);
     box-shadow: 0 2px 8px rgba(42,93,159,0.13);
-    transform: translateY(-2px) scale(1.03);
     color: #fff;
+    /* Remove transform to prevent size change */
+}
+.btn:active {
+    filter: brightness(0.93);
+    background: linear-gradient(90deg, #1a3e7e 60%, #2a5d9f 100%);
+    color: #fff;
+    /* No transform for active state */
 }
 
 input, select, textarea {
@@ -120,6 +135,139 @@ a:hover {
     border-left-color: #c0392b;
 }
 
+.curriculum-list {
+    text-align: left;
+    white-space: pre-wrap;
+    background: #f8faff;
+    padding: 18px 10px;
+    border-radius: 10px;
+    font-size: 1.05rem;
+    margin-top: 8px;
+    line-height: 1.8;
+    border: 1.5px solid #c3d0e8;
+    box-shadow: 0 2px 12px rgba(42,93,159,0.07);
+    margin-bottom: 18px;
+}
+
+.curriculum-item {
+    background: #e0e7ff;
+    color: #2a5d9f;
+    font-weight: bold;
+    border-left: 5px solid #2a5d9f;
+    padding: 10px 14px;
+    margin: 18px 0 10px 0;
+    border-radius: 7px;
+    font-size: 1.13rem;
+    position: relative;
+    padding-left: 38px;
+    background: linear-gradient(90deg, #e0e7ff 80%, #f8faff 100%);
+    border-left: 6px solid #2a5d9f;
+    box-shadow: 0 2px 8px rgba(42,93,159,0.08);
+}
+.curriculum-item::before {
+    content: "📘";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2em;
+}
+
+.curriculum-subitem {
+    background: #f0f4fa;
+    color: #1a3e7e;
+    border-left: 4px solid #4e8ad1;
+    padding: 8px 12px;
+    margin: 8px 0 8px 24px;
+    border-radius: 6px;
+    font-size: 1.04rem;
+    position: relative;
+    padding-left: 32px;
+    margin: 8px 0 8px 24px;
+    background: linear-gradient(90deg, #f0f4fa 80%, #fff 100%);
+    border-left: 4px solid #4e8ad1;
+    font-size: 1.04rem;
+    box-shadow: 0 1px 4px rgba(42,93,159,0.04);
+}
+.curriculum-subitem::before {
+    content: "📝";
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1em;
+}
+
+.curriculum-question {
+    background: #fffbe6;
+    color: #b8860b;
+    border-left: 4px solid #ffd700;
+    padding: 8px 12px;
+    margin: 16px 0 6px 0;
+    border-radius: 6px;
+    font-weight: 500;
+    position: relative;
+    padding-left: 32px;
+    margin: 16px 0 6px 0;
+    background: linear-gradient(90deg, #fffbe6 80%, #fff 100%);
+    border-left: 4px solid #ffd700;
+    font-weight: 500;
+    box-shadow: 0 1px 4px rgba(184,134,11,0.07);
+}
+.curriculum-question::before {
+    content: "❓";
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1em;
+}
+
+.curriculum-answer {
+    background: #e6fbe7;
+    color: #1e7e34;
+    border-left: 4px solid #1e7e34;
+    padding: 8px 12px;
+    margin: 6px 0 18px 0;
+    border-radius: 6px;
+    font-weight: 500;
+    position: relative;
+    padding-left: 32px;
+    margin: 6px 0 18px 0;
+    background: linear-gradient(90deg, #e6fbe7 80%, #fff 100%);
+    border-left: 4px solid #1e7e34;
+    font-weight: 500;
+    box-shadow: 0 1px 4px rgba(30,126,52,0.07);
+}
+.curriculum-answer::before {
+    content: "✅";
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1em;
+}
+
+#curriculum-form input[type="text"],
+#curriculum-form .btn {
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+}
+#assignment-form textarea,
+#assignment-form input[type="text"],
+#assignment-form .btn {
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+}
+#assignment-form textarea {
+    resize: vertical;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 100px;
+}
+
 @media (max-width: 600px) {
     .container {
         max-width: 98vw;
@@ -133,6 +281,33 @@ a:hover {
         font-size: 1rem;
         padding: 10px 0;
     }
+    .curriculum-item, .curriculum-subitem, .curriculum-question, .curriculum-answer {
+        font-size: 0.98rem;
+        padding-left: 28px;
+    }
+}
+@media (max-width: 900px) {
+    .container {
+        max-width: 98vw;
+        margin: 24px 2vw;
+        padding: 24px 4vw 24px 4vw;
+    }
+}
+
+#curriculum-form + #curriculum-result,
+#curriculum-form + .alert,
+#assignment-form + #evaluation-result,
+#assignment-form + .alert {
+    margin-top: 24px;
+}
+#curriculum-form + #alert-area,
+#assignment-form + #alert-area {
+    margin-top: 24px;
+}
+#alert-area .alert,
+#evaluation-result .alert {
+    margin-top: 0;
+    margin-bottom: 18px;
 }
 
 @keyframes fadeIn {
