@@ -1,7 +1,8 @@
 """
 BTK Hackathon 2025 - Eğitim Asistanı Uygulaması
 
-Bu uygulama, Google Gemini AI kullanarak eğitim içeriği oluşturan bir Flask web uygulamasıdır.
+Bu uygulama, Google Gemini AI kullanarak eğitim içeriği oluşturan
+bir Flask web uygulamasıdır.
 Özellikler:
 - Müfredat oluşturma
 - Ödev değerlendirme
@@ -39,19 +40,20 @@ load_dotenv()
 # __name__ parametresi Flask'a uygulama dosyasının konumunu söyler
 app = Flask(__name__)
 # Güvenlik için secret key ayarla (session yönetimi için gerekli)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default-secret-key')
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
 
 # Google Gemini API'yi yapılandır
 # Çevre değişkeninden API anahtarını al
-api_key = os.getenv('GEMINI_API_KEY')
+api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
     print("❌ GEMINI_API_KEY çevre değişkeni bulunamadı!")
-    print("Lütfen .env dosyasında GEMINI_API_KEY=your_api_key_here şeklinde tanımlayın")
+    print("Lütfen .env dosyasında GEMINI_API_KEY=your_api_key_here"
+          "şeklinde tanımlayın")
     exit(1)
 
 # Gemini AI modelini yapılandır ve başlat
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-1.5-pro')  # En güncel Gemini modelini kullan
+model = genai.GenerativeModel("gemini-2.5-flash")
 print("✅ Google Gemini API başarıyla bağlandı!")
 
 
@@ -60,13 +62,13 @@ print("✅ Google Gemini API başarıyla bağlandı!")
 def index():
     """
     Ana sayfa route'u - Uygulamanın giriş sayfasını görüntüler.
-    
+
     Bu route Flask uygulamasının ana sayfasını render eder.
     Kullanıcılar buradan eğitim asistanı özelliklerine erişebilir.
-    
+
     Returns:
         str: Render edilmiş HTML sayfası (templates/index.html)
-        
+
     Note:
         - GET metoduyla erişilebilir
         - templates/index.html dosyası mevcut olmalıdır
@@ -148,7 +150,9 @@ def api_assignment_evaluate():
             return jsonify({"error": "Değerlendirme kriteri boş olamaz"}), 400
 
         # Ödev değerlendirmesi yap
-        evaluation_result = evaluate_assignment(assignment_text, criteria, model=model)
+        evaluation_result = evaluate_assignment(assignment_text,
+                                                criteria,
+                                                model=model)
 
         return jsonify({
             "success": True,
@@ -163,28 +167,29 @@ def api_assignment_evaluate():
             "error": f"Ödev değerlendirilirken hata oluştu: {str(e)}"
         }), 500
 
+
 # Uygulamayı çalıştır
 if __name__ == "__main__":
     """
     Uygulama ana giriş noktası.
-    
-    Bu blok sadece dosya doğrudan çalıştırıldığında (python app.py) 
+
+    Bu blok sadece dosya doğrudan çalıştırıldığında (python app.py)
     çalışır. Import edildiğinde çalışmaz.
-    
+
     Geliştirme modunda (debug=True) çalıştırılır:
     - Kod değişikliklerinde otomatik yeniden başlatma
     - Detaylı hata mesajları
     - Hot reload özelliği
-    
+
     Production ortamında debug=False olmalıdır.
     """
     print("🚀 BTK Hackathon 2025 - Ersoy Kardeşler")
     print("📱 Uygulama URL: http://127.0.0.1:5000")
     print("🛑 Durdurmak için Ctrl+C tuşlayın")
-    
+
     # Flask development server'ı başlat
     app.run(
-        debug=True,     # Geliştirme modu - production'da False olmalı
-        host='127.0.0.1',  # Sadece localhost'tan erişim
-        port=5000       # Default Flask portu
+        debug=True,        # Geliştirme modu - production'da False olmalı
+        host="127.0.0.1",  # Sadece localhost'tan erişim
+        port=5000          # Default Flask portu
     )
