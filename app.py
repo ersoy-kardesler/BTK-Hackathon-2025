@@ -46,7 +46,7 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
 # Çevre değişkeninden API anahtarını al
 api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
-    print("❌ GEMINI_API_KEY çevre değişkeni bulunamadı!")
+    print("GEMINI_API_KEY çevre değişkeni bulunamadı!")
     print("Lütfen .env dosyasında GEMINI_API_KEY=your_api_key_here"
           "şeklinde tanımlayın")
     exit(1)
@@ -54,7 +54,7 @@ if not api_key:
 # Gemini AI modelini yapılandır ve başlat
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-2.5-flash")
-print("✅ Google Gemini API başarıyla bağlandı!")
+print("Google Gemini API başarıyla bağlandı!")
 
 
 # Ana sayfaya (/) gelen istekleri karşıla
@@ -183,9 +183,9 @@ if __name__ == "__main__":
 
     Production ortamında debug=False olmalıdır.
     """
-    print("🚀 BTK Hackathon 2025 - Ersoy Kardeşler")
-    print("📱 Uygulama URL: http://127.0.0.1:5000")
-    print("🛑 Durdurmak için Ctrl+C tuşlayın")
+    print("BTK Hackathon 2025 - Ersoy Kardeşler")
+    print("Uygulama URL: http://127.0.0.1:5000")
+    print("Durdurmak için Ctrl+C tuşlayın")
 
     # Flask development server'ı başlat
     app.run(

@@ -45,4 +45,4 @@ def generate_curriculum(subject,
         return response
 
     except Exception as e:
-        return f"❌ Hata oluştu: {str(e)}"
+        return f"Hata oluştu: {str(e)}"

@@ -6,10 +6,10 @@ def evaluate_assignment(assignment_text,
     ...
     """
     if not assignment_text.strip():
-        return "❌ Hata: Ödev metni boş olamaz." \
+        return "Hata: Ödev metni boş olamaz." \
                 "Lütfen değerlendirilecek içeriği girin."
     if len(assignment_text) < 10:
-        return "⚠️ Uyarı: Çok kısa ödev metni." \
+        return "Uyarı: Çok kısa ödev metni." \
                "Detaylı değerlendirme için daha uzun içerik önerilir."
 
     prompt = f"""
