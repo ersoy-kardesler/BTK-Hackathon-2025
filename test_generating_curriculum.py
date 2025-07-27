@@ -51,7 +51,7 @@ def test_generate_all():
     """
 
     # Başlığı yaz
-    print("Müfredat Oluşturma Sınaması Başlatılıyor...\n")
+    print("Müfredat Oluşturma Sınaması Başlatılıyor...")
     print("=" * 70)
 
     # Modeli al
@@ -64,11 +64,11 @@ def test_generate_all():
     question_count = 10
 
     # generate_all fonksiyonunu çağır
-    generate_curriculum(subject,
-                        duration,
-                        lesson_duration,
-                        question_count,
-                        model=model)
+    return generate_curriculum(subject,
+                               duration,
+                               lesson_duration,
+                               question_count,
+                               model=model)
 
 
 # Uygulamayı çalıştır
@@ -85,8 +85,8 @@ if __name__ == "__main__":
     print("Geliştirici: Ersoy Kardeşler")
     print("=" * 60)
     try:
-        # Sınama fonksiyonunu çalıştır
-        test_generate_all()
+        # Sınama fonksiyonunu çalıştır ve çıktısını yazdır
+        print(test_generate_all())
     except KeyboardInterrupt:
         # Kullanıcı durdurma iletisini yaz
         print("\n\nSınama kullanıcı tarafından durduruldu.")
