@@ -1,12 +1,17 @@
-def evaluate_assignment(assignment_text, criteria="Genel değerlendirme kriterleri", model=None):
+def evaluate_assignment(assignment_text,
+                        criteria="Genel değerlendirme kriterleri",
+                        model=None):
     """
     Öğrenci ödevini detaylı şekilde değerlendirir ve geri bildirim sağlar.
     ...
     """
     if not assignment_text.strip():
-        return "❌ Hata: Ödev metni boş olamaz. Lütfen değerlendirilecek içeriği girin."
+        return "❌ Hata: Ödev metni boş olamaz." \
+                "Lütfen değerlendirilecek içeriği girin."
     if len(assignment_text) < 10:
-        print("⚠️  Uyarı: Çok kısa ödev metni. Detaylı değerlendirme için daha uzun içerik önerilir.")
+        return "⚠️ Uyarı: Çok kısa ödev metni." \
+               "Detaylı değerlendirme için daha uzun içerik önerilir."
+
     prompt = f"""
     Aşağıdaki öğrenci ödevini eğitici ve yapıcı bir şekilde değerlendir:
 
@@ -48,8 +53,7 @@ def evaluate_assignment(assignment_text, criteria="Genel değerlendirme kriterle
     Öğrencinin moralini bozmadan gelişim alanlarını belirt.
     """
     try:
-        response = model.generate_content(prompt)
-        return response.text
+        response = model.generate_content(prompt).text
+        return response
     except Exception as e:
-        print(f"❌ Ödev değerlendirme hatası: {str(e)}")
         return f"Ödev değerlendirilirken hata oluştu: {str(e)}"
