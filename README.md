@@ -1,6 +1,6 @@
 # BTK Hackathon 2025
 
-**Bilgisayar Alanında Yapay Zeka Destekli Eğitim Müfredatı Oluşturup Eğitim Veren Eğitim Yönetim Sistemi**
+**Bilgisayar Alanında Yapay Zeka Destekli Eğitim Oluşturup Eğitim Veren Eğitim Yönetim Sistemi**
 
 Bu proje, Google Gemini AI entegrasyonu ile eğitim içerikleri oluşturabilen bir Flask web uygulamasıdır. Hem web arayüzü hem de backend API fonksiyonları sunmaktadır.
 
@@ -8,12 +8,12 @@ Bu proje, Google Gemini AI entegrasyonu ile eğitim içerikleri oluşturabilen b
 
 ### Web Arayüzü
 - **Ana Sayfa**: Kullanıcı dostu arayüz ile eğitim araçlarına erişim
-- **Müfredat Oluşturucu**: İnteraktif form ile müfredat hazırlama
+- **Eğitim Oluşturucu**: İnteraktif form ile eğitim hazırlama
 - **Ödev Değerlendirici**: Öğrenci ödevlerini AI ile otomatik değerlendirme
 - **Responsive Tasarım**: Mobil ve masaüstü uyumlu arayüz
 
 ### Backend API Fonksiyonları
-- **Müfredat Oluşturma**: `generate_curriculum()` - Detaylı eğitim müfredatı oluşturma
+- **Eğitim Oluşturma**: `generate_curriculum()` - Detaylı eğitim eğitimi oluşturma
 - **Ödev Değerlendirme**: `evaluate_assignment()` - Öğrenci ödevlerini değerlendirme ve geri bildirim
 - **Google Gemini AI Entegrasyonu**: Gelişmiş AI destekli içerik üretimi
 
@@ -73,14 +73,14 @@ python app.py
 
 ### Backend Fonksiyonlarını Test Etme
 ```bash
-python test_generating_curriculum.py
+python test_generating_education.py
 ```
 
 ### Web Uygulamasını Test Etme
 1. Uygulamayı başlatın: `python app.py`
 2. Tarayıcıda http://localhost:5000 adresine gidin
 3. Ana sayfa üzerinden farklı özelliikleri test edin:
-   - **Müfredat Oluşturma**: Konu, süre ve ders süresi belirleyerek müfredat oluşturun
+   - **Eğitim Oluşturma**: Konu, süre ve ders süresi belirleyerek eğitim oluşturun
    - **Ödev Değerlendirme**: Öğrenci ödevlerini yükleyip AI ile değerlendirin
 
 ## Proje Yapısı
@@ -88,7 +88,7 @@ python test_generating_curriculum.py
 ```
 BTK-Hackathon-2025/
 ├── app.py                            # Ana Flask uygulaması ve route'lar
-├── generate_curriculum.py            # Müfredat oluşturma fonksiyonu
+├── generate_education.py             # Eğitim oluşturma fonksiyonu
 ├── evaluate_assignment.py            # Ödev değerlendirme fonksiyonu
 ├── test_generating_curriculum.py     # Backend fonksiyon test scripti
 ├── requirements.txt                  # Python bağımlılıkları
@@ -97,7 +97,7 @@ BTK-Hackathon-2025/
 ├── .env                              # API anahtarları (gizli dosya)
 ├── templates/
 │   ├── index.html                    # Ana sayfa
-│   ├── curriculum.html               # Müfredat oluşturma sayfası
+│   ├── curriculum.html               # Eğitim oluşturma sayfası
 │   └── assignment_evaluate.html      # Ödev değerlendirme sayfası
 └── static/
     └── css/
@@ -108,7 +108,7 @@ BTK-Hackathon-2025/
 
 Proje ayrıca backend fonksiyonlarını doğrudan Python scriptlerinde kullanabilmenizi sağlar:
 
-### Müfredat Oluşturma
+### Eğitim Oluşturma
 ```python
 from generate_curriculum import generate_curriculum
 import google.generativeai as genai
@@ -117,7 +117,7 @@ import google.generativeai as genai
 genai.configure(api_key="your_api_key")
 model = genai.GenerativeModel('gemini-pro')
 
-# Müfredat oluştur
+# Eğitim oluştur
 result = generate_curriculum(
     subject="Python Programlama",
     duration="12 hafta",
@@ -162,7 +162,7 @@ print(evaluation)
 
 ### Modüler Yapı
 - `app.py`: Flask uygulaması ve route tanımları
-- `generate_curriculum.py`: Müfredat oluşturma algoritması
+- `generate_education.py`: Eğitim oluşturma algoritması
 - `evaluate_assignment.py`: Ödev değerlendirme algoritması
 - `templates/`: HTML şablonları
 - `static/`: CSS ve statik dosyalar

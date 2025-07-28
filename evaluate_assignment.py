@@ -1,5 +1,5 @@
 """
-BTK Hackathon 2025 - Gemini API ile Müfredat Oluşturma Kaynak Kodları
+BTK Hackathon 2025 - Gemini API ile Eğitim Oluşturma Kaynak Kodları
 
 Telif Hakkı © 2025 Ersoy Kardeşler
 Bütün hakları saklıdır.

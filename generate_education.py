@@ -1,10 +1,10 @@
 """
-BTK Hackathon 2025 - Gemini API ile Müfredat Oluşturma Kaynak Kodları
+BTK Hackathon 2025 - Gemini API ile Eğitim Oluşturma Kaynak Kodları
 
 Telif Hakkı © 2025 Ersoy Kardeşler
 Bütün hakları saklıdır.
 
-Bu dosya, Gemini API kullanarak müfredat oluşturmayı sınar.
+Bu dosya, Gemini API kullanarak eğitim oluşturmayı sınar.
 """
 
 
@@ -15,17 +15,17 @@ def generate_education(subject,
                        question_count=10,
                        model=None):
     """
-    Belirtilen konu için müfredat, ders planı, ders içerikleri ve
+    Belirtilen konu için eğitim, ders planı, ders içerikleri ve
     sınav soruları oluşturur ve hepsini bir defada yazdırır.
     """
 
     try:
         prompt_content_of_education = f"""
 Bilgisayar alanında \"{subject}\" konusunda {duration} süresinde
-bir eğitim müfredatı oluştur. Müfredat şu şekilde olmalı:
+bir eğitim oluştur. Müfredat şu şekilde olmalı:
 
 1. Eğitim hedefleri (Somut ve ölçülebilir hedefler)
-2. Eğitim müfredatında yer alan dersler (Temelden uzmanlığa
+2. Eğitim eğitiminde yer alan dersler (Temelden uzmanlığa
 kadar sıralama)
 3. Her ders için haftalık konular ve
 alt başlıklar (Kronolojik sıralama)
@@ -45,7 +45,7 @@ Ayrıca, aşağıdaki içerikleri de oluştur:
 Tüm içerikleri Türkçe olarak, ayrıntılı ve düzenli bir biçimde
 hazırla.
 
-Bu müfredat için her ders için haftalık olarak ders içeriklerinin
+Bu eğitim için her ders için haftalık olarak ders içeriklerinin
 hepsini bir defada hazırla. Ders {duration} hafta sürecektir ve
 her hafta {lesson_duration} dakikalık ders olacaktır.
 

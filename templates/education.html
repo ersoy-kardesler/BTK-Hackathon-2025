@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Müfredat Oluştur</title>
+    <title>Eğitim Oluştur</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <main>
         <section class="container container-wide">
-            <h1>Müfredat Oluştur</h1>
-            <p>Yapay zeka ile otomatik olarak detaylı müfredat, ders planı ve quiz soruları oluşturun.</p>
-            <form id="curriculum-form" autocomplete="off">
+            <h1>Eğitim Oluştur</h1>
+            <p>Yapay zeka ile otomatik olarak detaylı eğitim, ders planı ve quiz soruları oluşturun.</p>
+            <form id="education-form" autocomplete="off">
                 <label for="subject">Ders Adı</label>
                 <input type="text" id="subject" name="subject" placeholder="Ders Adı (örnek: Python Programlama)" required>
-                <button id="generate-btn" class="btn" type="submit">Müfredat Oluştur</button>
+                <button id="generate-btn" class="btn" type="submit">Eğitim Oluştur</button>
             </form>
             <div id="alert-area"></div>
-            <section id="curriculum-result" style="margin-top:24px;"></section>
+            <section id="education-result" style="margin-top:24px;"></section>
             <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
         </section>
     </main>
@@ -26,7 +26,7 @@
         e.preventDefault();
         const subject = document.getElementById('subject').value.trim();
         const alertArea = document.getElementById('alert-area');
-        const resultDiv = document.getElementById('curriculum-result');
+        const resultDiv = document.getElementById('education-result');
         alertArea.innerHTML = '';
         resultDiv.innerHTML = '';
         if (!subject) {
@@ -34,19 +34,19 @@
             return;
         }
         // Show loading message
-        alertArea.innerHTML = '<div class="alert">Müfredat oluşturuluyor... Lütfen bekleyiniz.</div>';
+        alertArea.innerHTML = '<div class="alert">Eğitim oluşturuluyor... Lütfen bekleyiniz.</div>';
         try {
-            const response = await fetch('/api/curriculum', {
+            const response = await fetch('/api/education', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ subject })
             });
             const data = await response.json();
             alertArea.innerHTML = '';
-            if (response.ok && data.success && data.curriculum) {
-                const curriculum = data.curriculum;
+            if (response.ok && data.success && data.education) {
+                const education = data.education;
                 // Remove HTML formatting, show as plain text
-                resultDiv.innerHTML = `<div class='alert success'><b>${data.subject}</b> için oluşturulan müfredat:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${curriculum.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
+                resultDiv.innerHTML = `<div class='alert success'><b>${data.subject}</b> için oluşturulan eğitim:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${education.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
             } else if (data && data.error) {
                 alertArea.innerHTML = `<div class='alert error'>${data.error}</div>`;
             } else {
