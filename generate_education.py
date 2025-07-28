@@ -25,7 +25,7 @@ Bilgisayar alanında \"{subject}\" konusunda {duration} süresinde
 bir eğitim oluştur. Müfredat şu şekilde olmalı:
 
 1. Eğitim hedefleri (Somut ve ölçülebilir hedefler)
-2. Eğitim eğitiminde yer alan dersler (Temelden uzmanlığa
+2. Eğitimde yer alan dersler (Temelden uzmanlığa
 kadar sıralama)
 3. Her ders için haftalık konular ve
 alt başlıklar (Kronolojik sıralama)
