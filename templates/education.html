@@ -34,7 +34,7 @@
             return;
         }
         // Show loading message
-        alertArea.innerHTML = '<div class="alert">Eğitim oluşturuluyor... Lütfen bekleyiniz.</div>';
+        alertArea.innerHTML = '<div class="alert">Eğitim oluşturuluyor... Bu, birkaç dakika sürebilir. Lütfen bekleyiniz.</div>';
         try {
             const response = await fetch('/api/education', {
                 method: 'POST',

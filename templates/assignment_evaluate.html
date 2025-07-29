@@ -35,7 +35,7 @@
             return;
         }
         // Show loading message
-        alertArea.innerHTML = '<div class="alert">Ödev değerlendiriliyor... Lütfen bekleyiniz.</div>';
+        alertArea.innerHTML = '<div class="alert">Ödev değerlendiriliyor... Bu, birkaç dakika sürebilir. Lütfen bekleyiniz.</div>';
         try {
             const response = await fetch('/api/assignment_evaluate', {
                 method: 'POST',
