@@ -8,13 +8,13 @@
 </head>
 <body>
     <main>
-        <section class="container container-wide">
-            <h1>Ödev Değerlendir</h1>
-            <p>Yapay zeka ile ödevleri otomatik olarak değerlendirin.</p>
+        <section class="container-wide">
+            <h1>Ödev Değerlendirme</h1>
+            <p>Yapay zeka ile ödevleri otomatik olarak değerlendirebilirsiniz.</p>
             <form id="assignment-form" autocomplete="off">
                 <textarea name="assignment_text" id="assignment_text" placeholder="Ödev metnini girin" required style="height:100px;"></textarea>
                 <input type="text" name="criteria" id="criteria" placeholder="Değerlendirme kriteri (örn: Anlatım, içerik, özgünlük...)" required>
-                <button type="submit" class="btn">Değerlendir</button>
+                <button type="submit" class="btn">Ödevi Değerlendir</button>
             </form>
             <div id="alert-area"></div>
             <div id="evaluation-result" style="margin-top:24px;"></div>
@@ -31,10 +31,10 @@
         alertArea.innerHTML = '';
         resultDiv.innerHTML = '';
         if (!assignment_text || !criteria) {
-            alertArea.innerHTML = '<div class="alert error">Tüm alanları doldurun.</div>';
+            alertArea.innerHTML = '<div class="alert error">Tüm alanları doldurunuz!</div>';
             return;
         }
-        // Show loading message
+        // Yükleme mesajını göster
         alertArea.innerHTML = '<div class="alert">Ödev değerlendiriliyor... Bu, birkaç dakika sürebilir. Lütfen bekleyiniz.</div>';
         try {
             const response = await fetch('/api/assignment_evaluate', {
@@ -44,14 +44,16 @@
             });
             const data = await response.json();
             alertArea.innerHTML = '';
-            if (data.success) {
-                // Remove HTML formatting, show as plain text
+            if (response.ok && data.success && data.education) {
+                // Yapay zeka çıktısını düz metin olarak göster
                 resultDiv.innerHTML = `<div class='alert success'>Değerlendirme Sonucu:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${data.evaluation.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
+            } else if (data && data.error) {
+                alertArea.innerHTML = `<div class='alert error'>Veri alındı ama hata oluştu: ${data.error}</div>`;
             } else {
-                alertArea.innerHTML = `<div class='alert error'>${data.error || 'Bilinmeyen bir hata oluştu.'}</div>`;
+                alertArea.innerHTML = `<div class='alert error'>Sunucudan geçersiz veri alındı!</div>`;
             }
         } catch (err) {
-            alertArea.innerHTML = `<div class='alert error'>Sunucuya bağlanılamadı.</div>`;
+            alertArea.innerHTML = `<div class='alert error'>Sunucuya bağlanılamadı: ${err.message}</div>`;
         }
     });
     </script>

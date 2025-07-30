@@ -8,9 +8,9 @@
 </head>
 <body>
     <main>
-        <section class="container container-wide">
-            <h1>Eğitim Oluştur</h1>
-            <p>Yapay zeka ile otomatik olarak detaylı eğitim, ders planı ve quiz soruları oluşturun.</p>
+        <section class="container-wide">
+            <h1>Eğitim Oluşturma</h1>
+            <p>Yapay zeka ile otomatik olarak detaylı eğitim, ders planı ve quiz soruları oluşturabilirsiniz.</p>
             <form id="education-form" autocomplete="off">
                 <label for="subject">Ders Adı</label>
                 <input type="text" id="subject" name="subject" placeholder="Ders Adı (örnek: Python Programlama)" required>
@@ -29,11 +29,12 @@
         const resultDiv = document.getElementById('education-result');
         alertArea.innerHTML = '';
         resultDiv.innerHTML = '';
+        // Hata mesajını göster
         if (!subject) {
-            alertArea.innerHTML = '<div class="alert error">Ders adı boş olamaz.</div>';
+            alertArea.innerHTML = '<div class="alert error">Ders adı boş olamaz!</div>';
             return;
         }
-        // Show loading message
+        // Yükleme mesajını göster
         alertArea.innerHTML = '<div class="alert">Eğitim oluşturuluyor... Bu, birkaç dakika sürebilir. Lütfen bekleyiniz.</div>';
         try {
             const response = await fetch('/api/education', {
@@ -45,12 +46,12 @@
             alertArea.innerHTML = '';
             if (response.ok && data.success && data.education) {
                 const education = data.education;
-                // Remove HTML formatting, show as plain text
+                // Yapay zeka çıktısını düz metin olarak göster
                 resultDiv.innerHTML = `<div class='alert success'><b>${data.subject}</b> için oluşturulan eğitim:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${education.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
             } else if (data && data.error) {
-                alertArea.innerHTML = `<div class='alert error'>${data.error}</div>`;
+                alertArea.innerHTML = `<div class='alert error'>Veri alındı ama hata oluştu: ${data.error}</div>`;
             } else {
-                alertArea.innerHTML = `<div class='alert error'>Sunucudan geçersiz veri alındı.</div>`;
+                alertArea.innerHTML = `<div class='alert error'>Sunucudan geçersiz veri alındı!</div>`;
             }
         } catch (err) {
             alertArea.innerHTML = `<div class='alert error'>Sunucuya bağlanılamadı: ${err.message}</div>`;
