@@ -4,7 +4,7 @@ BTK Hackathon 2025 - Eğitim Oluşturma Sınama Uygulaması
 Telif Hakkı © 2025 Ersoy Kardeşler
 Bütün hakları saklıdır.
 
-Bu dosya, eğitim oluşturmayı sınar.
+Bu dosya, eğitim oluşturma işlevini sınar.
 
 Kullanım:
     python test_generating_education.py
@@ -22,8 +22,8 @@ Yazarlar: Ersoy Kardeşler
 import os
 import google.generativeai as genai
 
-from generate_education import generate_education
 from dotenv import load_dotenv
+from generate_education import generate_education
 
 
 # Gemini modellerinden birini döndüren fonksiyon
@@ -76,7 +76,7 @@ def test_generate_all():
                                   model=model)
 
     # Sınama sonucunu dosyaya yaz
-    with open("test/education.txt", "w", encoding="utf-8") as f:
+    with open("test/result_education.txt", "w", encoding="utf-8") as f:
         f.write(response)
 
     # Sınama sonucunu döndür
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     """
 
     # Başlığı yaz
-    print("BTK Hackathon 2025 - Eğitim Oluşturma Sınaması (Tüm İçerikler)")
+    print("BTK Hackathon 2025 - Eğitim Oluşturma Sınaması")
     print("=" * 60)
     print("Geliştirici: Ersoy Kardeşler")
     print("=" * 60)
