@@ -24,12 +24,13 @@ Yazarlar: Ersoy Kardeşler
 import google.generativeai as genai
 import os
 
+from configparser import ConfigParser
 from config.config_loader import load_config, get_secret_key
 from dotenv import load_dotenv
 from education.generate_education import generate_education
 from education.evaluate_assignment import evaluate_assignment
 from flask import Flask, render_template, request, jsonify
-from configparser import ConfigParser
+
 
 # .env dosyasından çevre değişkenlerini yükle
 # Bu dosya API anahtarları ve diğer gizli bilgileri içerir
