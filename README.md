@@ -13,7 +13,7 @@ Bu proje, Google Gemini AI entegrasyonu ile eğitim içerikleri oluşturabilen b
 - **Responsive Tasarım**: Mobil ve masaüstü uyumlu arayüz
 
 ### Backend API Fonksiyonları
-- **Eğitim Oluşturma**: `generate_curriculum()` - Detaylı eğitim eğitimi oluşturma
+- **Eğitim Oluşturma**: `generate_education()` - Detaylı eğitim müfredatı oluşturma
 - **Ödev Değerlendirme**: `evaluate_assignment()` - Öğrenci ödevlerini değerlendirme ve geri bildirim
 - **Google Gemini AI Entegrasyonu**: Gelişmiş AI destekli içerik üretimi
 
@@ -74,12 +74,13 @@ python app.py
 ### Backend Fonksiyonlarını Test Etme
 ```bash
 python test_generating_education.py
+python test_evaluate_assignment.py
 ```
 
 ### Web Uygulamasını Test Etme
 1. Uygulamayı başlatın: `python app.py`
 2. Tarayıcıda http://localhost:5000 adresine gidin
-3. Ana sayfa üzerinden farklı özelliikleri test edin:
+3. Ana sayfa üzerinden farklı özellikleri test edin:
    - **Eğitim Oluşturma**: Konu, süre ve ders süresi belirleyerek eğitim oluşturun
    - **Ödev Değerlendirme**: Öğrenci ödevlerini yükleyip AI ile değerlendirin
 
@@ -88,20 +89,24 @@ python test_generating_education.py
 ```
 BTK-Hackathon-2025/
 ├── app.py                            # Ana Flask uygulaması ve route'lar
-├── generate_education.py             # Eğitim oluşturma fonksiyonu
-├── evaluate_assignment.py            # Ödev değerlendirme fonksiyonu
-├── test_generating_curriculum.py     # Backend fonksiyon test scripti
 ├── requirements.txt                  # Python bağımlılıkları
 ├── README.md                         # Bu dosya
-├── .gitignore                        # Git için dışlanma dosyası
 ├── .env                              # API anahtarları (gizli dosya)
+├── .gitignore                        # Git için dışlanma dosyası ('.env' mutlaka eklenmeli)
+├── test_generating_education.py      # Eğitim oluşturma test scripti
+├── test_evaluate_assignment.py       # Ödev değerlendirme test scripti
+├── education_app/
+│   ├── generate_education.py         # Eğitim oluşturma fonksiyonu
+│   └── evaluate_assignment.py        # Ödev değerlendirme fonksiyonu
 ├── templates/
 │   ├── index.html                    # Ana sayfa
-│   ├── curriculum.html               # Eğitim oluşturma sayfası
+│   ├── education.html                # Eğitim oluşturma sayfası
 │   └── assignment_evaluate.html      # Ödev değerlendirme sayfası
-└── static/
-    └── css/
-        └── style.css                 # CSS stilleri
+├── static/
+│   └── css/
+│       └── style.css                 # CSS stilleri
+└── test/
+    └── README.txt                    # Test sonuçları açıklaması
 ```
 
 ## API Kullanımı
@@ -110,7 +115,7 @@ Proje ayrıca backend fonksiyonlarını doğrudan Python scriptlerinde kullanabi
 
 ### Eğitim Oluşturma
 ```python
-from generate_curriculum import generate_curriculum
+from education_app.generate_education import generate_education
 import google.generativeai as genai
 
 # API'yi yapılandır
@@ -118,7 +123,7 @@ genai.configure(api_key="your_api_key")
 model = genai.GenerativeModel('gemini-pro')
 
 # Eğitim oluştur
-result = generate_curriculum(
+result = generate_education(
     subject="Python Programlama",
     duration="12 hafta",
     lesson_duration=90,
@@ -130,7 +135,7 @@ print(result)
 
 ### Ödev Değerlendirme
 ```python
-from evaluate_assignment import evaluate_assignment
+from education_app.evaluate_assignment import evaluate_assignment
 
 # Ödev değerlendir
 evaluation = evaluate_assignment(
@@ -161,11 +166,12 @@ print(evaluation)
 - **Çevre Değişkenleri**: python-dotenv
 
 ### Modüler Yapı
-- `app.py`: Flask uygulaması ve route tanımları
-- `generate_education.py`: Eğitim oluşturma algoritması
-- `evaluate_assignment.py`: Ödev değerlendirme algoritması
+- `app.py`: Flask uygulaması programı
+- `education_app/generate_education.py`: Eğitim oluşturma programı
+- `education_app/evaluate_assignment.py`: Ödev değerlendirme programı
 - `templates/`: HTML şablonları
 - `static/`: CSS ve statik dosyalar
+- `test/`: Test sonuçları ve dokümantasyon
 
 ## Lisans
 

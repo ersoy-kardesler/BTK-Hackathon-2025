@@ -29,8 +29,8 @@ from dotenv import load_dotenv
 
 
 # Fonksiyonları ayrı dosyalardan import et
-from generate_education import generate_education
-from evaluate_assignment import evaluate_assignment
+from education_app.generate_education import generate_education
+from education_app.evaluate_assignment import evaluate_assignment
 
 # .env dosyasından çevre değişkenlerini yükle
 # Bu dosya API anahtarları ve diğer gizli bilgileri içerir

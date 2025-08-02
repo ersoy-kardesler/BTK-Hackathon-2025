@@ -23,7 +23,7 @@ import os
 import google.generativeai as genai
 
 from dotenv import load_dotenv
-from generate_education import generate_education
+from education_app.generate_education import generate_education
 
 
 # Gemini modellerinden birini döndüren fonksiyon
