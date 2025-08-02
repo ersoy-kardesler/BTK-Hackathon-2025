@@ -23,7 +23,7 @@ import os
 import google.generativeai as genai
 
 from dotenv import load_dotenv
-from education_app.evaluate_assignment import evaluate_assignment
+from education.evaluate_assignment import evaluate_assignment
 
 
 # Gemini modellerinden birini döndüren fonksiyon

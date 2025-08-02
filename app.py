@@ -21,26 +21,30 @@ Kullanım:
 Yazarlar: Ersoy Kardeşler
 """
 
-from flask import Flask, render_template, request, jsonify
-
 import google.generativeai as genai
 import os
+
+from config.config_loader import load_config, get_secret_key
 from dotenv import load_dotenv
-
-
-# Fonksiyonları ayrı dosyalardan import et
-from education_app.generate_education import generate_education
-from education_app.evaluate_assignment import evaluate_assignment
+from education.generate_education import generate_education
+from education.evaluate_assignment import evaluate_assignment
+from flask import Flask, render_template, request, jsonify
+from configparser import ConfigParser
 
 # .env dosyasından çevre değişkenlerini yükle
 # Bu dosya API anahtarları ve diğer gizli bilgileri içerir
 load_dotenv()
 
+# Konfigürasyon ayarlarını yükle
+config = load_config()
+
 # Flask uygulamasını başlat
 # __name__ parametresi Flask'a uygulama dosyasının konumunu söyler
 app = Flask(__name__)
-# Güvenlik için secret key ayarla (session yönetimi için gerekli)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "default-secret-key")
+
+# Konfigürasyonu Flask uygulamasına uygula
+app.secret_key = get_secret_key()
+app.config.update(config)
 
 # Google Gemini API'yi yapılandır
 # Çevre değişkeninden API anahtarını al
@@ -181,12 +185,17 @@ if __name__ == "__main__":
 
     Production ortamında debug=False olmalıdır.
     """
+
     print("BTK Hackathon 2025 - Ersoy Kardeşler")
     print("Durdurmak için Ctrl+C tuşlayın")
+    print(f"Konfigürasyon dosyasından yüklenen ayarlar:")
+    print(f"- DEBUG: {config.get('DEBUG', False)}")
+    print(f"- HOST: {config.get('HOST', '0.0.0.0')}")
+    print(f"- PORT: {config.get('PORT', 5000)}")
 
     # Flask development server'ı başlat
     app.run(
-        debug=True,        # Geliştirme modu - production'da False olmalı
-        host="127.0.0.1",  # Sadece localhost'tan erişim
-        port=5000          # Default Flask portu
+        debug=config.get('DEBUG', False),
+        host=config.get('HOST', '0.0.0.0'),
+        port=config.get('PORT', 5000)
     )

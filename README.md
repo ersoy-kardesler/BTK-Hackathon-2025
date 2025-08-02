@@ -21,7 +21,6 @@ Bu proje, Google Gemini AI entegrasyonu ile eğitim içerikleri oluşturabilen b
 
 - Python 3.8+
 - Flask 3.0.0
-- Google Gemini API Key
 - python-dotenv 1.0.0
 - google-generativeai 0.8.3
 
@@ -46,13 +45,36 @@ venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
-4. **Çevre değişkenlerini ayarlayın:**
+4. **Çevre değişkenlerini ve konfigürasyonu ayarlayın:**
+
+   **Çevre Değişkenleri (.env dosyası):**
    - Proje klasöründe `.env` dosyası oluşturun
-   - Aşağıdaki içeriği `.env` dosyasına ekleyin:
+   - `.env.example` dosyasını referans alarak aşağıdaki içeriği `.env` dosyasına ekleyin:
    ```env
    GEMINI_API_KEY=your_actual_api_key_here
-   FLASK_SECRET_KEY=your_secret_key_here
    ```
+
+   **Uygulama Konfigürasyonu (config/config.ini dosyası):**
+   - `config/config.ini` dosyası uygulama ayarlarını içerir
+   - **FLASK_SECRET_KEY sadece bu dosyada tanımlıdır**
+   - Varsayılan olarak güvenli ayarlarla gelir
+   - İsteğe bağlı olarak özelleştirebilirsiniz:
+   ```ini
+   [flask]
+   SECRET_KEY = your-custom-secret-key
+
+   [app]
+   DEBUG = False
+   HOST = 0.0.0.0
+   PORT = 5000
+
+   [security]
+   SESSION_COOKIE_SECURE = True
+   SESSION_COOKIE_HTTPONLY = True
+   PERMANENT_SESSION_LIFETIME = 3600
+   ```
+
+   **Not:** FLASK_SECRET_KEY sadece config/config.ini dosyasından okunur, çevre değişkenlerinden okunmaz.
 
 5. **Uygulamayı başlatın:**
 ```bash
@@ -89,13 +111,15 @@ python test_evaluate_assignment.py
 ```
 BTK-Hackathon-2025/
 ├── app.py                            # Ana Flask uygulaması ve route'lar
+├── config/
+│   └── config_loader.py              # INI dosyası okuyucu modülü
 ├── requirements.txt                  # Python bağımlılıkları
 ├── README.md                         # Bu dosya
 ├── .env                              # API anahtarları (gizli dosya)
 ├── .gitignore                        # Git için dışlanma dosyası ('.env' mutlaka eklenmeli)
 ├── test_generating_education.py      # Eğitim oluşturma test scripti
 ├── test_evaluate_assignment.py       # Ödev değerlendirme test scripti
-├── education_app/
+├── education/
 │   ├── generate_education.py         # Eğitim oluşturma fonksiyonu
 │   └── evaluate_assignment.py        # Ödev değerlendirme fonksiyonu
 ├── templates/
@@ -115,7 +139,7 @@ Proje ayrıca backend fonksiyonlarını doğrudan Python scriptlerinde kullanabi
 
 ### Eğitim Oluşturma
 ```python
-from education_app.generate_education import generate_education
+from education.generate_education import generate_education
 import google.generativeai as genai
 
 # API'yi yapılandır
@@ -135,7 +159,7 @@ print(result)
 
 ### Ödev Değerlendirme
 ```python
-from education_app.evaluate_assignment import evaluate_assignment
+from education.evaluate_assignment import evaluate_assignment
 
 # Ödev değerlendir
 evaluation = evaluate_assignment(
@@ -167,8 +191,9 @@ print(evaluation)
 
 ### Modüler Yapı
 - `app.py`: Flask uygulaması programı
-- `education_app/generate_education.py`: Eğitim oluşturma programı
-- `education_app/evaluate_assignment.py`: Ödev değerlendirme programı
+- `education/generate_education.py`: Eğitim oluşturma programı
+- `education/evaluate_assignment.py`: Ödev değerlendirme programı
+- `config/config_loader.py`: Konfigürasyon yönetimi
 - `templates/`: HTML şablonları
 - `static/`: CSS ve statik dosyalar
 - `test/`: Test sonuçları ve dokümantasyon
