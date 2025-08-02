@@ -1,0 +1,22 @@
+# BTK Hackathon 2025 - Konfigürasyon Dosyası Örneği
+# Bu dosyayı config.ini olarak kopyalayın ve ayarlarınızı yapın
+
+[database]
+# MariaDB/MySQL veritabanı ayarları
+DB_HOST = localhost
+DB_PORT = 3306
+DB_USER = root
+DB_PASSWORD = your_password_here
+DB_NAME = btk_hackathon_2025
+DB_CHARSET = utf8mb4
+DB_COLLATION = utf8mb4_unicode_ci
+
+[security]
+# Flask güvenlik ayarları
+SECRET_KEY = your_secret_key_here
+
+[app]
+# Uygulama ayarları
+DEBUG = False
+HOST = 127.0.0.1
+PORT = 5000

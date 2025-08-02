@@ -7,22 +7,22 @@ Bütün hakları saklıdır.
 Bu dosya, ödev değerlendirme işlevini sınar.
 
 Kullanım:
-    python test_generating_education.py
+    python test_evaluate_assignment.py
 
 Gereksinimler:
-- Ortam değişkenlerinde GEMINI_API_KEY tanımlı olmalı
+- config.ini dosyasında GEMINI_API_KEY tanımlı olmalı
 - app.py ile aynı dizinde bulunmalı
 - Internet bağlantısı (API çağrıları için)
+- MariaDB veritabanı bağlantısı
 
 Yazarlar: Ersoy Kardeşler
 """
 
-
 # Gerekli kütüphanelerin içe aktarılması
-import os
 import google.generativeai as genai
 
-from dotenv import load_dotenv
+from config.config_loader import load_config
+from database.database_connection import get_system_config, init_database
 from education.evaluate_assignment import evaluate_assignment
 
 
@@ -31,22 +31,23 @@ def get_gemini_model():
     """
     Google Gemini API modelini yapılandırır ve döndürür.
     """
-    # .env dosyasını yükle
-    load_dotenv()
+    # Veritabanını başlat
+    if not init_database():
+        print("HATA: Veritabanı bağlantısı kurulamadı!")
+        return None
 
-    # API anahtarını al
-    api_key = os.getenv("GEMINI_API_KEY")
+    # Konfigürasyonu yükle
+    config = load_config()
 
-    # Eğer API anahtarı yoksa
+    # Test için Gemini API anahtarını elle girin
+    api_key = input("Lütfen Gemini API anahtarınızı girin: ").strip()
     if not api_key:
-        # Hata fırlat
-        raise RuntimeError("GEMINI_API_KEY .env dosyasında tanımlı olmalı!")
-
-    # API anahtarını yapılandır
+        raise RuntimeError("Gemini API anahtarı girilmedi!")
     genai.configure(api_key=api_key)
 
     # Modeli döndür
-    return genai.GenerativeModel("gemini-2.5-flash")
+    gemini_model = config.get("GEMINI_MODEL", "gemini-2.5-flash")
+    return genai.GenerativeModel(gemini_model)
 
 
 # generate_all fonksiyonunun sınayan fonksiyon
@@ -63,7 +64,6 @@ def test_generate_all():
     model = get_gemini_model()
 
     # Çeşitli yapılandırmalar
-    subject = "Bilgisayar Mühendisliği"
     assignment_text = """
     1. Soru: Yazılım ve donanım arasındaki fark nedir?
 
@@ -138,16 +138,10 @@ birbirine bağlanmasıdır. Örnek: LAN (yerel ağ), WAN (geniş alan ağı),
     criteria = "Genel değerlendirme kriterleri"
 
     # generate_all fonksiyonunu çağır
-    response = evaluate_assignment(
-        assignment_text,
-        criteria,
-        model
-    )
+    response = evaluate_assignment(assignment_text, criteria, model)
 
     # Sınama sonucunu dosyaya yaz
-    with open(
-        "test/result_assignment.txt", "w", encoding="utf-8"
-    ) as f:
+    with open("test/result_assignment.txt", "w", encoding="utf-8") as f:
         f.write(response)
 
     # Sınama sonucunu döndür
@@ -171,17 +165,11 @@ if __name__ == "__main__":
         print(test_generate_all())
     except KeyboardInterrupt:
         # Kullanıcı durdurma iletisini yaz
-        print(
-            "\n\nSınama kullanıcı tarafından durduruldu."
-        )
+        print("\n\nSınama kullanıcı tarafından durduruldu.")
     except Exception as e:
         # Hata iletisini yaz
-        print(
-            f"\n\nKritik hata oluştu: {str(e)}"
-        )
-        print(
-            "Lütfen .env dosyasını ve API ayarlarını kontrol edin."
-        )
+        print(f"\n\nKritik hata oluştu: {str(e)}")
+        print("Lütfen .env dosyasını ve API ayarlarını kontrol edin.")
     finally:
         # Son iletiyi yaz
         print("\n" + "=" * 60)

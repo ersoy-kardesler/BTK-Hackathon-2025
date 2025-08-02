@@ -23,6 +23,9 @@ Bu proje, Google Gemini AI entegrasyonu ile eğitim içerikleri oluşturabilen b
 - Flask 3.0.0
 - python-dotenv 1.0.0
 - google-generativeai 0.8.3
+- mysql-connector-python 8.2.0
+- bcrypt 4.1.2
+- cryptography 45.0.5
 
 ## Kurulum
 
@@ -45,36 +48,46 @@ venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
-4. **Çevre değişkenlerini ve konfigürasyonu ayarlayın:**
+4. **Konfigürasyon dosyasını ayarlayın:**
 
-   **Çevre Değişkenleri (.env dosyası):**
-   - Proje klasöründe `.env` dosyası oluşturun
-   - `.env.example` dosyasını referans alarak aşağıdaki içeriği `.env` dosyasına ekleyin:
-   ```env
-   GEMINI_API_KEY=your_actual_api_key_here
-   ```
-
-   **Uygulama Konfigürasyonu (config/config.ini dosyası):**
-   - `config/config.ini` dosyası uygulama ayarlarını içerir
-   - **FLASK_SECRET_KEY sadece bu dosyada tanımlıdır**
-   - Varsayılan olarak güvenli ayarlarla gelir
-   - İsteğe bağlı olarak özelleştirebilirsiniz:
+   **Ana Konfigürasyon (config.ini dosyası):**
+   - `config.ini.example` dosyasını `config.ini` olarak kopyalayın
+   - Aşağıdaki bölümleri doldurun:
    ```ini
-   [flask]
-   SECRET_KEY = your-custom-secret-key
+   [database]
+   DB_HOST = localhost
+   DB_PORT = 3306
+   DB_USER = root
+   DB_PASSWORD = your_password_here
+   DB_NAME = btk_hackathon_2025
+
+   [api]
+   # İlk çalıştırmada veritabanına kaydedilir
+   GEMINI_API_KEY = your_gemini_api_key_here
+   GEMINI_MODEL = gemini-2.5-flash
+
+   [security]
+   SECRET_KEY = your_secret_key_here
 
    [app]
    DEBUG = False
-   HOST = 0.0.0.0
+   HOST = 127.0.0.1
    PORT = 5000
-
-   [security]
-   SESSION_COOKIE_SECURE = True
-   SESSION_COOKIE_HTTPONLY = True
-   PERMANENT_SESSION_LIFETIME = 3600
    ```
 
-   **Not:** FLASK_SECRET_KEY sadece config/config.ini dosyasından okunur, çevre değişkenlerinden okunmaz.
+   **Not:** Gemini API anahtarı ilk çalıştırmada config.ini dosyasından alınıp veritabanına kaydedilir. Sonraki çalıştırmalarda veritabanından kullanılır.
+
+5. **MariaDB/MySQL veritabanını ayarlayın:**
+```bash
+# MariaDB veya MySQL'e bağlanın
+mysql -u root -p
+
+# Veritabanını oluşturun
+CREATE DATABASE btk_hackathon_2025;
+
+# Şemayı import edin
+mysql -u root -p btk_hackathon_2025 < database_schema.sql
+```
 
 5. **Uygulamayı başlatın:**
 ```bash
@@ -185,6 +198,8 @@ print(evaluation)
 ### Kullanılan Teknolojiler
 - **Backend**: Flask (Python Web Framework)
 - **AI**: Google Gemini API (Generative AI)
+- **Database**: MySQL/MariaDB
+- **Şifreleme**: bcrypt, cryptography
 - **Frontend**: HTML5, CSS3, JavaScript
 - **Paket Yönetimi**: pip, requirements.txt
 - **Çevre Değişkenleri**: python-dotenv

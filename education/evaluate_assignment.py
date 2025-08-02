@@ -9,19 +9,23 @@ Bu dosya, Gemini API kullanarak ödev değerlendirir.
 
 
 # Ödevi değerlendiren fonksiyon
-def evaluate_assignment(assignment_text,
-                        criteria="Genel değerlendirme kriterleri",
-                        model=None):
+def evaluate_assignment(
+    assignment_text,
+    criteria="Genel değerlendirme kriterleri",
+    model=None
+):
     """
     Öğrenci ödevini detaylı şekilde değerlendirir ve geri bildirim sağlar.
     ...
     """
     if not assignment_text.strip():
-        return "Hata: Ödev metni boş olamaz." \
-            "Lütfen değerlendirilecek içeriği girin."
+        return "Hata: Ödev metni boş olamaz. " \
+               "Lütfen değerlendirilecek içeriği girin."
     if len(assignment_text) < 10:
-        return "Uyarı: Çok kısa ödev metni." \
+        return (
+            "Uyarı: Çok kısa ödev metni."
             "Detaylı değerlendirme için daha uzun içerik önerilir."
+        )
 
     prompt = f"""
 Aşağıdaki öğrenci ödevini eğitici ve yapıcı bir şekilde değerlendir:

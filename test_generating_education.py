@@ -10,19 +10,19 @@ Kullanım:
     python test_generating_education.py
 
 Gereksinimler:
-- Ortam değişkenlerinde GEMINI_API_KEY tanımlı olmalı
+- config.ini dosyasında GEMINI_API_KEY tanımlı olmalı
 - app.py ile aynı dizinde bulunmalı
 - Internet bağlantısı (API çağrıları için)
+- MariaDB veritabanı bağlantısı
 
 Yazarlar: Ersoy Kardeşler
 """
 
-
 # Gerekli kütüphanelerin içe aktarılması
-import os
 import google.generativeai as genai
 
-from dotenv import load_dotenv
+from config.config_loader import load_config
+from database.database_connection import get_system_config, init_database
 from education.generate_education import generate_education
 
 
@@ -31,22 +31,23 @@ def get_gemini_model():
     """
     Google Gemini API modelini yapılandırır ve döndürür.
     """
-    # .env dosyasını yükle
-    load_dotenv()
+    # Veritabanını başlat
+    if not init_database():
+        print("HATA: Veritabanı bağlantısı kurulamadı!")
+        return None
 
-    # API anahtarını al
-    api_key = os.getenv("GEMINI_API_KEY")
+    # Konfigürasyonu yükle
+    config = load_config()
 
-    # Eğer API anahtarı yoksa
+    # Test için Gemini API anahtarını elle girin
+    api_key = input("Lütfen Gemini API anahtarınızı girin: ").strip()
     if not api_key:
-        # Hata fırlat
-        raise RuntimeError("GEMINI_API_KEY .env dosyasında tanımlı olmalı!")
-
-    # API anahtarını yapılandır
+        raise RuntimeError("Gemini API anahtarı girilmedi!")
     genai.configure(api_key=api_key)
 
     # Modeli döndür
-    return genai.GenerativeModel("gemini-2.5-flash")
+    gemini_model = config.get("GEMINI_MODEL", "gemini-2.5-flash")
+    return genai.GenerativeModel(gemini_model)
 
 
 # generate_all fonksiyonunun sınayan fonksiyon
@@ -69,11 +70,9 @@ def test_generate_all():
     question_count = 10
 
     # generate_all fonksiyonunu çağır
-    response = generate_education(subject,
-                                  duration,
-                                  lesson_duration,
-                                  question_count,
-                                  model=model)
+    response = generate_education(
+        subject, duration, lesson_duration, question_count, model=model
+    )
 
     # Sınama sonucunu dosyaya yaz
     with open("test/result_education.txt", "w", encoding="utf-8") as f:

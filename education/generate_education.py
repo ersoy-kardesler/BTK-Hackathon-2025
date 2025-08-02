@@ -9,11 +9,13 @@ Bu dosya, Gemini API kullanarak eğitim oluşturmayı sınar.
 
 
 # Eğitimi oluşturan fonksiyon
-def generate_education(subject,
-                       duration="14 hafta",
-                       lesson_duration=60,
-                       question_count=10,
-                       model=None):
+def generate_education(
+    subject,
+    duration="14 hafta",
+    lesson_duration=60,
+    question_count=10,
+    model=None
+):
     """
     Belirtilen konu için eğitim, ders planı, ders içerikleri ve
     sınav soruları oluşturur ve hepsini bir defada yazdırır.
