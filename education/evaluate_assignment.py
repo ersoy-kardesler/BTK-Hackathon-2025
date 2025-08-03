@@ -15,7 +15,9 @@ def evaluate_assignment(
     model=None
 ):
     """
-    Öğrenci ödevini detaylı şekilde değerlendirir ve geri bildirim sağlar.
+    Ödevi değerlendiren fonksiyon
+
+    Öğrenci ödevini detaylı şekilde değerlendirir ve sonuç üretir.
     ...
     """
     if not assignment_text.strip():

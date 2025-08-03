@@ -5,24 +5,13 @@ Telif Hakkı © 2025 Ersoy Kardeşler
 Bütün hakları saklıdır.
 
 Bu dosya, ödev değerlendirme işlevini sınar.
-
-Kullanım:
-    python test_evaluate_assignment.py
-
-Gereksinimler:
-- config.ini dosyasında GEMINI_API_KEY tanımlı olmalı
-- app.py ile aynı dizinde bulunmalı
-- Internet bağlantısı (API çağrıları için)
-- MariaDB veritabanı bağlantısı
-
-Yazarlar: Ersoy Kardeşler
 """
 
 # Gerekli kütüphanelerin içe aktarılması
 import google.generativeai as genai
 
 from config.config_loader import load_config
-from database.database_connection import get_system_config, init_database
+
 from education.evaluate_assignment import evaluate_assignment
 
 
@@ -31,10 +20,6 @@ def get_gemini_model():
     """
     Google Gemini API modelini yapılandırır ve döndürür.
     """
-    # Veritabanını başlat
-    if not init_database():
-        print("HATA: Veritabanı bağlantısı kurulamadı!")
-        return None
 
     # Konfigürasyonu yükle
     config = load_config()

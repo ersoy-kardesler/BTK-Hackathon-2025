@@ -1,30 +1,37 @@
 """
-Konfigürasyon dosyası okuyucu modülü
+BTK Hackathon 2025 - MariaDB Bağlantı Modülü
 
-Bu modül config.ini dosyasını okuyarak uygulama ayarlarını yükler.
+Telif Hakkı © 2025 Ersoy Kardeşler
+Bütün hakları saklıdır.
+
+Bu modül config.ini dosyasını okuyarak uygulama yapılandırmalarını yükler.
 """
 
+
+# Gerekli kütüphanelerin içe aktarılması
 import configparser
 import os
 import secrets
+
 from typing import Dict, Any
 
 
+# Yapılandırma dosyasından yapılandırmaları yükleme fonksiyonu
 def load_config(config_file: str = "config/config.ini") -> Dict[str, Any]:
     """
-    INI dosyasından konfigürasyon ayarlarını yükler.
+    Yapılandırma dosyasından yapılandırmaları yükleme fonksiyonu
 
-    Args:
-        config_file (str): Konfigürasyon dosyasının yolu
+    Parametreler:
+        config_file (str): Yapılandırmadosyasının yolu
 
-    Returns:
-        Dict[str, Any]: Konfigürasyon ayarları
+    Döndürülenler:
+        Dict[str, Any]: Yapılandırmaları
     """
-    # INI dosyasının varlığını kontrol et
+    # Yapılandırma dosyasının varlığını denetle
     if not os.path.exists(config_file):
         print(
             f"Uyarı: {config_file} dosyası bulunamadı."
-            "Varsayılan ayarlar kullanılacak."
+            "Varsayılan yapılandırmalar kullanılacak."
         )
         return get_default_config(config_file)
 
@@ -32,15 +39,15 @@ def load_config(config_file: str = "config/config.ini") -> Dict[str, Any]:
         config = configparser.ConfigParser()
         config.read(config_file)
 
-        # Tüm ayarları varsayılan değerlerle birlikte al
+        # Tüm yapılandırmaları varsayılan değerlerle birlikte al
         return {
-            # Flask ayarları
+            # Flask yapılandırmaları
             "SECRET_KEY": config.get(
                 "flask",
                 "SECRET_KEY",
                 fallback="default-secret-key"
             ),
-            # Uygulama ayarları
+            # Uygulama yapılandırmaları
             "DEBUG": config.getboolean("app",
                                        "DEBUG",
                                        fallback=False),
@@ -50,7 +57,7 @@ def load_config(config_file: str = "config/config.ini") -> Dict[str, Any]:
             "PORT": config.getint("app",
                                   "PORT",
                                   fallback=5000),
-            # Veritabanı ayarları
+            # Veri tabanı yapılandırmaları
             "DB_HOST": config.get("database",
                                   "DB_HOST",
                                   fallback="localhost"),
@@ -74,7 +81,7 @@ def load_config(config_file: str = "config/config.ini") -> Dict[str, Any]:
                 "DB_COLLATION",
                 fallback="utf8mb4_unicode_ci"
             ),
-            # Uygulama ayarları (mevcut)
+            # Mevcut uygulama yapılandırmaları
             "DEBUG": config.getboolean("app",
                                        "DEBUG",
                                        fallback=False),
@@ -84,7 +91,7 @@ def load_config(config_file: str = "config/config.ini") -> Dict[str, Any]:
             "PORT": config.getint("app",
                                   "PORT",
                                   fallback=5000),
-            # Güvenlik ayarları (mevcut)
+            # GMevcut güvenlik yapılandırmaları
             "SESSION_COOKIE_SECURE": config.getboolean(
                 "security",
                 "SESSION_COOKIE_SECURE",
@@ -107,20 +114,25 @@ def load_config(config_file: str = "config/config.ini") -> Dict[str, Any]:
         return get_default_config()
 
 
+# Varsayılan yapılandırmaları döndürür ve config.ini dosyasını oluşturma
+# fonksiyonu
 def get_default_config(config_file: str =
                        "config/config.ini") -> Dict[str, Any]:
     """
-    Varsayılan konfigürasyon ayarlarını döndürür ve
-    config.ini dosyasını oluşturur.
-    Flask için güvenli rastgele secret key oluşturur.
+    Varsayılan yapılandırmaları döndürür ve config.ini dosyasını oluşturma
+    fonksiyonu
 
-    Returns:
-        Dict[str, Any]: Varsayılan ayarlar
+    Flask için güvenli rastgele gizli anahtar oluşturur.
+
+    Döndürülenler:
+        Dict[str, Any]: Varsayılan yapılandırmalar
     """
-    # Flask için rastgele güvenli secret key oluştur
-    secret_key = secrets.token_hex(32)  # 64 karakter uzunluğunda hex string
+    # Flask için rastgele güvenli gizli anahtar oluştur
+    # 64 karakter uzunluğunda 16 tabanındaki sayıların
+    # oluşturduğu sözce
+    secret_key = secrets.token_hex(32)
 
-    # Varsayılan ayarlar
+    # Varsayılan yapılandırmalar
     defaults = {
         "SECRET_KEY": secret_key,
         "DEBUG": False,
@@ -179,18 +191,18 @@ def get_default_config(config_file: str =
     return defaults
 
 
+# Yapılandırma dosyasından gizli anahtarı alma fonksiyonu
 def get_secret_key(config_file: str = "config/config.ini") -> str:
     """
-    INI dosyasından SECRET_KEY'i alır.
-    Sadece INI dosyasından okur, çevre değişkeni kullanmaz.
+    Yapılandırma dosyasından gizli anahtarı alma fonksiyonu
 
-    Args:
-        config_file (str): Konfigürasyon dosyasının yolu
+    Parametreler:
+        config_file (str): Yapılandırma dosyasının yolu
 
-    Returns:
-        str: Secret key değeri
+    Döndürülenler:
+        str: Gizli anahtar değeri
     """
 
-    # INI dosyasından oku
+    # Yapılandırma dosyasından oku
     config = load_config(config_file)
     return config.get("SECRET_KEY", "default-secret-key")

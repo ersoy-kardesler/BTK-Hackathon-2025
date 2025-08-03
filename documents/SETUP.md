@@ -5,7 +5,7 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
 ## Gereksinimler
 
 - Python 3.10 veya üzeri
-- MariaDB veritabanı sunucusu
+- MariaDB veri tabanı sunucusu
 - `pip` ve `virtualenv` yüklü olmalıdır
 
 ## MariaDB Kurulumu
@@ -35,12 +35,12 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
    ```bash
    sudo mysql_secure_installation
    ```
-   - Root şifresi belirleyin.
-   - Varsayılan ayarları takip edin (örneğin, anonim kullanıcıları kaldırın, test veritabanını silin).
+   - Yönetici kullanıcı (root) parolası belirleyin.
+   - Varsayılan ayarları takip edin (örneğin, anonim kullanıcıları kaldırın, sınama veri tabanını silin).
 
 # Kurulum Adımları
 
-1. **Depoyu Klonlayın**
+1. **Depoyu Alın**
 
    ```bash
    git clone https://github.com/ersoy-kardesler/BTK-Hackathon-2025.git
@@ -70,7 +70,7 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
 
 5. **Yapılandırmayı Düzenleyin**
 
-   - Konfigürasyon dosyasını oluşturun:
+   - Yapılandırma dosyasını oluşturun:
      ```bash
      cp config/config.ini.example config/config.ini
      ```
@@ -78,7 +78,7 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
      ```bash
      nano config/config.ini
      ```
-   - Aşağıdaki veritabanı ayarlarını yapılandırın:
+   - Aşağıdaki veri tabanı ayarlarını yapılandırın:
      ```ini
      [database]
      DB_HOST = localhost
@@ -94,12 +94,12 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
      DEBUG = True
 
    - **Önemli Yapılandırma Notları:**
-     - `DB_PASSWORD`: MariaDB root şifrenizi veya oluşturduğunuz kullanıcının şifresini girin
+     - `DB_PASSWORD`: MariaDB yönetici kullanıcısı (root) parolanızı veya oluşturduğunuz kullanıcının parolasını girin
      - `SECRET_KEY`: Güçlü bir gizli anahtar oluşturun:
        ```bash
        python -c "import secrets; print(secrets.token_hex(32))"
        ```
-     - Güvenlik için ayrı veritabanı kullanıcısı oluşturmanız önerilir
+     - Güvenlik için ayrı veri tabanı kullanıcısı oluşturmanız önerilir
      - Production ortamında `DEBUG = False` olarak bırakın
 
 6. **Uygulamayı Çalıştırın**
@@ -121,16 +121,16 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
 
 # Kurulumun Doğrulanması
 
-Kurulumdan sonra aşağıdaki adımları izleyerek uygulamanın doğru çalıştığını test edebilirsiniz:
+Kurulumdan sonra aşağıdaki adımları izleyerek uygulamanın doğru çalıştığını sınayabilrisiniz:
 
-1. Tarayıcınızda `http://127.0.0.1:5000` adresine gidin ve ana sayfanın açıldığını doğrulayın.
-2. Hatalarla karşılaşırsanız terminaldeki hata mesajlarını inceleyin.
-3. Gerekirse `config/config.ini` ve veritabanı ayarlarını tekrar kontrol edin.
+1. Web tarayıcınızda `http://127.0.0.1:5000` adresine gidin ve ana sayfanın açıldığını doğrulayın.
+2. Hatalarla karşılaşırsanız terminaldeki hata iletilerini inceleyin.
+3. Gerekirse `config/config.ini` ve veri tabanı ayarlarını tekrar kontrol edin.
 
 ---
 
 # Ek Notlar ve Öneriler
 
 - Geliştirme ortamında çalışıyorsanız `DEBUG = True` bırakabilirsiniz, canlı ortamda mutlaka `False` yapın.
-- MariaDB yerine MySQL de kullanılabilir, ancak şema ve bağlantı ayarlarını kontrol edin.
-- Güvenlik için root kullanıcısı yerine ayrı bir veritabanı kullanıcısı oluşturmanız önerilir.
+- MariaDB yerine MySQL de kullanılabilir, ancak şema ve bağlantı ayarlarını denetleyin.
+- Güvenlik için yönetici kullanıcı (root) kullanıcısı yerine ayrı bir veri tabanı kullanıcısı oluşturmanız önerilir.

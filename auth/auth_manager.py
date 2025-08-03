@@ -1,10 +1,15 @@
 """
-Kullanıcı kimlik doğrulama modülü
+BTK Hackathon 2025 - Kullanıcı Kimlik Doğrulama Modülü
 
-Bu modül kullanıcı girişi, çıkışı ve oturum yönetimi
-fonksiyonlarını sağlar.
+Telif Hakkı © 2025 Ersoy Kardeşler
+Bütün hakları saklıdır.
+
+Bu modül kullanıcı girişi, çıkışı ve oturum yönetimi fonksiyonlarını
+sağlar.
 """
 
+
+# Gerekli kütüphanelerin içe aktarılması
 import bcrypt
 import logging
 import secrets
@@ -17,38 +22,43 @@ from typing import Optional, Dict, Any, Tuple
 logger = logging.getLogger(__name__)
 
 
+# Kimlik doğrulama hataları için özel durum sınıfı
 class AuthenticationError(Exception):
-    """Kimlik doğrulama hataları için özel exception"""
+    """Kimlik doğrulama hataları için özel durum sınıfı"""
 
     pass
 
 
+# Oturum yönetimi sınıfı
 class SessionManager:
     """Oturum yönetimi sınıfı"""
 
+    # Yapıcı fonksiyon
     def __init__(self):
         self.db = get_db()
         self.session_duration = timedelta(hours=24)  # 24 saat
 
+    # Güvenli oturum işareti oluşturma fonksiyonu
     def generate_session_token(self) -> str:
         """
-        Güvenli oturum token'ı oluşturur
+        Güvenli oturum işareti oluşturma fonksiyonu
 
         Returns:
             str: Oturum token'ı
         """
         return secrets.token_urlsafe(32)
 
+    # Kullanıcı için yeni oturum oluşturma fonksiyonu
     def create_session(
         self, user_id: int, ip_address: str = None, user_agent: str = None
     ) -> str:
         """
-        Kullanıcı için yeni oturum oluşturur
+        Kullanıcı için yeni oturum oluşturma fonksiyonu
 
         Args:
-            user_id (int): Kullanıcı ID'si
+            user_id (int): Kullanıcı kimliği
             ip_address (str, optional): IP adresi
-            user_agent (str, optional): User agent bilgisi
+            user_agent (str, optional): Kullanıcı aracısı bilgisi
 
         Returns:
             str: Oturum token'ı
@@ -77,13 +87,13 @@ class SessionManager:
             logger.error(f"Oturum oluşturma hatası: {e}")
             raise AuthenticationError("Oturum oluşturulamadı")
 
+    # Oturum işaretini doğrulama fonksiyonu
     def validate_session(self, token: str) -> Optional[Dict[str, Any]]:
         """
-        Oturum token'ını doğrular
+        Oturum işaretini doğrulama fonksiyonu
 
         Args:
-            token (str): Oturum token'ı
-
+            token (str): Oturum işareti
         Returns:
             Dict[str, Any] | None: Kullanıcı bilgileri veya None
         """
@@ -103,7 +113,8 @@ class SessionManager:
 
             # Süresi dolmuş veya geçersiz token
             if result and not result["is_active"]:
-                logger.warning(f"Pasif kullanıcı oturum girişi:" "{result['username']}")
+                logger.warning(f"Pasif kullanıcı oturum girişi:",
+                               "{result['username']}")
 
             return None
 
@@ -111,12 +122,13 @@ class SessionManager:
             logger.error(f"Oturum doğrulama hatası: {e}")
             return None
 
+    # Oturumu sonlandırma fonksiyonu
     def destroy_session(self, token: str) -> bool:
         """
-        Oturumu sonlandırır
+        Oturumu sonlandırma fonksiyonu
 
         Args:
-            token (str): Oturum token'ı
+            token (str): Oturum işareti
 
         Returns:
             bool: İşlem başarılıysa True
@@ -135,12 +147,13 @@ class SessionManager:
             logger.error(f"Oturum sonlandırma hatası: {e}")
             return False
 
+    # Kullanıcının tüm oturumlarını sonlandırma fonksiyonu
     def destroy_user_sessions(self, user_id: int) -> bool:
         """
-        Kullanıcının tüm oturumlarını sonlandırır
+        Kullanıcının tüm oturumlarını sonlandırma fonksiyonu
 
         Args:
-            user_id (int): Kullanıcı ID'si
+            user_id (int): Kullanıcı kimliği
 
         Returns:
             bool: İşlem başarılıysa True
@@ -150,7 +163,8 @@ class SessionManager:
             affected_rows = self.db.execute_update(query, (user_id,))
 
             logger.info(
-                f"Kullanıcı {user_id} için " "{affected_rows} oturum sonlandırıldı"
+                f"Kullanıcı {user_id} için "
+                "{affected_rows} oturum sonlandırıldı"
             )
             return True
 
@@ -158,9 +172,10 @@ class SessionManager:
             logger.error(f"Kullanıcı oturumları sonlandırma hatası: {e}")
             return False
 
+    # Kullanıcının son giriş zamanını güncelleme fonksiyonu
     def update_last_login(self, user_id: int) -> bool:
         """
-        Kullanıcının son giriş zamanını günceller
+        Kullanıcının son giriş zamanını güncelleme fonksiyonu
 
         Args:
             user_id (int): Kullanıcı ID'si
@@ -177,9 +192,10 @@ class SessionManager:
             logger.error(f"Son giriş zamanı güncelleme hatası: {e}")
             return False
 
+    # Süresi dolmuş oturumları temizleme fonksiyonu
     def cleanup_expired_sessions(self) -> int:
         """
-        Süresi dolmuş oturumları temizler
+        Süresi dolmuş oturumları temizleme fonksiyonu
 
         Returns:
             int: Temizlenen oturum sayısı
@@ -198,36 +214,40 @@ class SessionManager:
             return 0
 
 
+# Kullanıcı kimlik doğrulama sınıfı
 class UserAuth:
     """Kullanıcı kimlik doğrulama sınıfı"""
 
+    # Yapıcı fonksiyon
     def __init__(self):
         self.db = get_db()
         self.session_manager = SessionManager()
 
+    # Parolayı güvenli şekilde karıştırma fonksiyonu
     def hash_password(self, password: str) -> str:
         """
-        Şifreyi güvenli şekilde hash'ler
+        Parolayı güvenli şekilde karıştırma fonksiyonu
 
         Args:
-            password (str): Ham şifre
+            password (str): Ham parola
 
         Returns:
-            str: Hash'lenmiş şifre
+            str: Karıştırılmış parola
         """
         salt = bcrypt.gensalt()
         return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
 
+    # Parolayı doğrulama fonksiyonu
     def verify_password(self, password: str, password_hash: str) -> bool:
         """
-        Şifreyi doğrular
+        Parolayı doğrulama fonksiyonu
 
         Args:
-            password (str): Ham şifre
-            password_hash (str): Hash'lenmiş şifre
+            password (str): Ham parola
+            password_hash (str): Karıştırılmış parola
 
         Returns:
-            bool: Şifre doğruysa True
+            bool: Parola doğruysa True
         """
         try:
             return bcrypt.checkpw(
@@ -236,6 +256,7 @@ class UserAuth:
         except Exception:
             return False
 
+    # Kullanıcı girişi yapma fonksiyonu
     def login(
         self,
         username_or_email: str,
@@ -244,17 +265,17 @@ class UserAuth:
         user_agent: str = None,
     ) -> Tuple[bool, Optional[str], Optional[Dict[str, Any]]]:
         """
-        Kullanıcı girişi yapar
+        Kullanıcı girişi yapma fonksiyonu
 
         Args:
-            username_or_email (str): Kullanıcı adı veya e-posta
-            password (str): Şifre
+            username_or_email (str): Kullanıcı adı veya e-posta adresi
+            password (str): Parola
             ip_address (str, optional): IP adresi
-            user_agent (str, optional): User agent
+            user_agent (str, optional): Kullanıcı aracısı
 
         Returns:
             Tuple[bool, Optional[str], Optional[Dict]]:
-            (Başarı durumu, Session token, Kullanıcı bilgileri)
+            (Başarı durumu, Session  işareti, Kullanıcı bilgileri)
         """
         try:
             # Kullanıcıyı bul
@@ -265,15 +286,17 @@ class UserAuth:
                  WHERE (username = %s OR email = %s) AND is_active = TRUE
             """
 
-            user = self.db.execute_single(query, (username_or_email, username_or_email))
+            user = self.db.execute_single(query,
+                                          (username_or_email,
+                                           username_or_email))
 
             if not user:
                 logger.warning(f"Geçersiz giriş denemesi: {username_or_email}")
                 return False, None, None
 
-            # Şifreyi doğrula
+            # Parolayı doğrula
             if not self.verify_password(password, user["password_hash"]):
-                logger.warning(f"Hatalı şifre girişi: {user['username']}")
+                logger.warning(f"Hatalı parola girişi: {user['username']}")
                 return False, None, None
 
             # Oturum oluştur
@@ -297,30 +320,33 @@ class UserAuth:
             logger.error(f"Giriş hatası: {e}")
             return False, None, None
 
+    # Kullanıcı çıkışı yapma fonksiyonu
     def logout(self, session_token: str) -> bool:
         """
-        Kullanıcı çıkışı yapar
+        Kullanıcı çıkışı yapma fonksiyonu
 
         Args:
-            session_token (str): Oturum token'ı
+            session_token (str): Oturum işaretçisi
 
         Returns:
             bool: İşlem başarılıysa True
         """
         return self.session_manager.destroy_session(session_token)
 
+    # Oturum işaretçisinden kullanıcı bilgilerini getirme fonksiyonu
     def get_current_user(self, session_token: str) -> Optional[Dict[str, Any]]:
         """
-        Oturum token'ından kullanıcı bilgilerini getirir
+        Oturum işaretçisinden kullanıcı bilgilerini getirme fonksiyonu
 
         Args:
-            session_token (str): Oturum token'ı
+            session_token (str): Oturum işaretçisi
 
         Returns:
             Dict[str, Any] | None: Kullanıcı bilgileri
         """
         return self.session_manager.validate_session(session_token)
 
+    # Yeni kullanıcı kaydetme fonksiyonu
     def register_user(
         self,
         username: str,
@@ -330,20 +356,20 @@ class UserAuth:
         role: str = "normal",
     ) -> Tuple[bool, Optional[str]]:
         """
-        Yeni kullanıcı kaydeder
+        Yeni kullanıcı kaydetme fonksiyonu
 
         Args:
             username (str): Kullanıcı adı
-            email (str): E-posta
-            password (str): Şifre
+            email (str): E-posta adresi
+            password (str): Parola
             full_name (str, optional): Tam ad
             role (str): Kullanıcı rolü
 
         Returns:
-            Tuple[bool, Optional[str]]: (Başarı durumu, Hata mesajı)
+            Tuple[bool, Optional[str]]: (Başarı durumu, Hata iletisi)
         """
         try:
-            # Kullanıcı adı ve e-posta kontrolü
+            # Kullanıcı adı ve e-posta adresi denetimi
             check_query = """
                 SELECT COUNT(*) as count FROM users
                  WHERE username = %s OR email = %s
@@ -351,9 +377,10 @@ class UserAuth:
 
             existing = self.db.execute_single(check_query, (username, email))
             if existing and existing["count"] > 0:
-                return False, "Kullanıcı adı veya e-posta zaten kullanımda"
+                return False, "Kullanıcı adı veya e-posta adresi"
+            "zaten kullanımda"
 
-            # Şifreyi hash'le
+            # Parolayı karıştır
             password_hash = self.hash_password(password)
 
             # Kullanıcıyı kaydet
@@ -377,22 +404,23 @@ class UserAuth:
             logger.error(f"Kullanıcı kaydetme hatası: {e}")
             return False, "Kayıt işlemi sırasında hata oluştu"
 
+    # Kullanıcı parolasını değiştirme fonksiyonu
     def change_password(
         self, user_id: int, old_password: str, new_password: str
     ) -> Tuple[bool, Optional[str]]:
         """
-        Kullanıcı şifresini değiştirir
+        Kullanıcı parolasını değiştirme fonksiyonu
 
         Args:
-            user_id (int): Kullanıcı ID'si
-            old_password (str): Eski şifre
-            new_password (str): Yeni şifre
+            user_id (int): Kullanıcı kimliği
+            old_password (str): Eski parola
+            new_password (str): Yeni parola
 
         Returns:
-            Tuple[bool, Optional[str]]: (Başarı durumu, Hata mesajı)
+            Tuple[bool, Optional[str]]: (Başarı durumu, Hata iletisi)
         """
         try:
-            # Mevcut şifreyi kontrol et
+            # Mevcut parolayı denetle
             query = "SELECT password_hash FROM users WHERE id = %s"
             user = self.db.execute_single(query, (user_id,))
 
@@ -400,47 +428,51 @@ class UserAuth:
                 return False, "Kullanıcı bulunamadı"
 
             if not self.verify_password(old_password, user["password_hash"]):
-                return False, "Mevcut şifre hatalı"
+                return False, "Mevcut parola hatalı"
 
-            # Yeni şifreyi hash'le ve güncelle
+            # Yeni parolayı karıştır ve güncelle
             new_hash = self.hash_password(new_password)
             update_query = "UPDATE users SET password_hash = %s WHERE id = %s"
 
-            affected_rows = self.db.execute_update(update_query, (new_hash, user_id))
+            affected_rows = self.db.execute_update(update_query,
+                                                   (new_hash,
+                                                    user_id))
 
             if affected_rows > 0:
                 # Kullanıcının diğer oturumlarını sonlandır
                 self.session_manager.destroy_user_sessions(user_id)
-                logger.info(f"Kullanıcı {user_id} şifresi değiştirildi")
+                logger.info(f"Kullanıcı {user_id} parolası değiştirildi")
                 return True, None
 
-            return False, "Şifre güncellenemedi"
+            return False, "Parola güncellenemedi"
 
         except Exception as e:
-            logger.error(f"Şifre değiştirme hatası: {e}")
-            return False, "Şifre değiştirme sırasında hata oluştu"
+            logger.error(f"Parola değiştirme hatası: {e}")
+            return False, "Parola değiştirme sırasında hata oluştu"
 
 
-# Singleton instances
+# Tekil örnekler
 auth = UserAuth()
 session_manager = SessionManager()
 
 
+# Kullanıcı doğrulama örneğini döndürme fonksiyonu
 def get_auth():
     """
-    Auth instance'ını döndürür
+    Kullanıcı doğrulama örneğini döndürme fonksiyonu
 
     Returns:
-        UserAuth: Auth nesnesi
+        UserAuth: Doğrulama nesnesi
     """
     return auth
 
 
+# Oturum yöneticisi örneğini döndürme fonksiyonu
 def get_session_manager():
     """
-    Session manager instance'ını döndürür
+    Oturum yöneticisi örneğini döndürme fonksiyonu
 
     Returns:
-        SessionManager: Session manager nesnesi
+        SessionManager: Oturum yöneticisi nesnesi
     """
     return session_manager

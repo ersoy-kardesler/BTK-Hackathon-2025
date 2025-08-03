@@ -21,30 +21,18 @@ wheels/
 *.egg
 MANIFEST
 
-# Virtual Environment
-venv/
-env/
-ENV/
-
-# Environment Variables
+# Ortam Değişkenleri Dosyaları
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Flask
+# Flask Dosyaları
 instance/
 .webassets-cache
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# İşletim sistemi dosyaları
+# İşletim Sistem Dosyaları
 .DS_Store
 .DS_Store?
 ._*
@@ -53,10 +41,10 @@ instance/
 ehthumbs.db
 Thumbs.db
 
-# Logs
+# Günlük Dosyaları
 *.log
 
-# Sanal ortamlar
+# Sanal Ortam Dosyaları
 venv/
 env/
 /bin
@@ -71,7 +59,7 @@ debug.log
 pip-log.txt
 pip-delete-this-arg.txt
 
-# Çekirdek ve günlük dosyaları
+# Çekirdek ve Günlük Dosyaları
 *.sqlite3
 *.log
 *.pot
@@ -86,13 +74,13 @@ pip-delete-this-arg.txt
 .sess
 .history
 
-# Test ve kapsama raporları
+# Sınama ve Kapsama Raporları
 .coverage
 .tox/
 htmlcov/
 .pytest_cache/
 
-# Veri dosyaları
+# Veri Dosyaları
 *.csv
 *.xls
 *.xlsx
@@ -100,22 +88,22 @@ htmlcov/
 *.sqlite
 *.db
 
-# Çıktı ve derleme dosyaları
+# Çıktı ve Derleme Dosyaları
 dist/
 build/
 *.egg-info/
 
-# Diğer yaygın dosyalar
+# Diğer Yaygın Dosyalar
 .env
 .flaskenv
 instance/
 
-# Jupyter Notebook dosyaları
+# Jupyter Notebook Dosyaları
 .ipynb_checkpoints/
 
-# Yapılandırma dosyaları
+# Yapılandırma Dosyaları
 *.ini
 
-# Uygulama tanımlı
+# Uygulama Tanımlı
 test/*
 !test/README.txt

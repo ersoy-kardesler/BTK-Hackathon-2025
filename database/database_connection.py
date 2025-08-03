@@ -1,11 +1,15 @@
 """
-MariaDB veritabanı bağlantı modülü
+BTK Hackathon 2025 - MariaDB Bağlantı Modülü
 
-Bu modül MariaDB veritabanı bağlantısını yönetir ve
-veritabanı işlemleri için temel fonksiyonları sağlar.
+Telif Hakkı © 2025 Ersoy Kardeşler
+Bütün hakları saklıdır.
+
+Bu modül MariaDB bağlantısını yönetir ve veri tabanı işlemleri için
+temel fonksiyonları sağlar.
 """
 
 
+# Gerekli kütüphanelerin içe aktarılması
 import base64
 import logging
 import mysql.connector
@@ -25,14 +29,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+# Veri tabanı bağlantı sınıfı
 class DatabaseConnection:
-    """MariaDB veritabanı bağlantı sınıfı"""
+    """MariaDB veri tabanı bağlantı sınıfı"""
 
+    # Yapıcı fonksiyon
     def __init__(self):
-        """
-        Veritabanı bağlantı ayarlarını konfigürasyon dosyasından yükler
-        """
-        # Konfigürasyon dosyasından yükle
+        # Yapılandırma dosyasından yükle
         config = load_config()
 
         self.config = {
@@ -47,11 +50,12 @@ class DatabaseConnection:
             "raise_on_warnings": True,
         }
 
+    # Veri tabanı bağlantısını sınama fonksiyonu
     def test_connection(self) -> bool:
         """
-        Veritabanı bağlantısını test eder
+        Veri tabanı bağlantısını sınama fonksiyonu
 
-        Returns:
+        Döndürülenler:
             bool: Bağlantı başarılıysa True, değilse False
         """
         try:
@@ -64,20 +68,21 @@ class DatabaseConnection:
             logger.error(f"MariaDB bağlantı hatası: {e}")
             return False
 
+    # Bağlam yöneticisi olarak veri tabanı bağlantısı sağlama fonksiyonu
     @contextmanager
     def get_connection(self):
         """
-        Context manager olarak veritabanı bağlantısı sağlar
+        Bağlam yöneticisi olarak veri tabanı bağlantısı sağlama fonksiyonu
 
         Yields:
-            mysql.connector.connection: Veritabanı bağlantısı
+            mysql.connector.connection: Veri tabanı bağlantısı
         """
         connection = None
         try:
             connection = mysql.connector.connect(**self.config)
             yield connection
         except Error as e:
-            logger.error(f"Veritabanı bağlantı hatası: {e}")
+            logger.error(f"Veri tabanı bağlantı hatası: {e}")
             if connection:
                 connection.rollback()
             raise
@@ -85,16 +90,17 @@ class DatabaseConnection:
             if connection and connection.is_connected():
                 connection.close()
 
+    # Bağlam yöneticisi olarak imleç sağlama fonksiyonu
     @contextmanager
     def get_cursor(self, dictionary=True):
         """
-        Context manager olarak cursor sağlar
+        Bağlam yöneticisi olarak imleç sağlama fonksiyonu
 
-        Args:
-            dictionary (bool): Sonuçları dict olarak döndürür
+        Parametreler:
+            dictionary (bool): Sonuçları sözlük olarak döndürür
 
         Yields:
-            mysql.connector.cursor: Veritabanı cursor'u
+            mysql.connector.cursor: Veri tabanı imleci
         """
         with self.get_connection() as connection:
             cursor = connection.cursor(dictionary=dictionary)
@@ -103,22 +109,23 @@ class DatabaseConnection:
                 connection.commit()
             except Error as e:
                 connection.rollback()
-                logger.error(f"Veritabanı sorgu hatası: {e}")
+                logger.error(f"Veri tabanı sorgu hatası: {e}")
                 raise
             finally:
                 cursor.close()
 
+    # SELECT sorgusu çalıştırır ve sonuçları döndürme fonksiyonu
     def execute_query(
         self, query: str, params: Optional[Tuple] = None
     ) -> List[Dict[str, Any]]:
         """
-        SELECT sorgusu çalıştırır ve sonuçları döndürür
+        SELECT sorgusu çalıştırır ve sonuçları döndürme fonksiyonu
 
-        Args:
+        Parametreler:
             query (str): SQL sorgusu
             params (tuple, optional): Sorgu parametreleri
 
-        Returns:
+        Döndürülenler:
             List[Dict[str, Any]]: Sorgu sonuçları
         """
         try:
@@ -129,17 +136,18 @@ class DatabaseConnection:
             logger.error(f"Sorgu çalıştırma hatası: {e}")
             raise
 
+    # Tek satır döndüren SELECT sorgusu çalıştırma fonksiyonu
     def execute_single(
         self, query: str, params: Optional[Tuple] = None
     ) -> Optional[Dict[str, Any]]:
         """
-        Tek satır döndüren SELECT sorgusu çalıştırır
+        Tek satır döndüren SELECT sorgusu çalıştırma fonksiyonu
 
-        Args:
+        Parametreler:
             query (str): SQL sorgusu
             params (tuple, optional): Sorgu parametreleri
 
-        Returns:
+        Döndürülenler:
             Dict[str, Any] | None: Sorgu sonucu veya None
         """
         try:
@@ -150,18 +158,21 @@ class DatabaseConnection:
             logger.error(f"Tek satır sorgu hatası: {e}")
             raise
 
+    # INSERT sorgusu çalıştırma ve eklenen kaydın kimliğini döndürme
+    # fonksiyonu
     def execute_insert(
             self, query: str, params: Optional[Tuple] = None
     ) -> int:
         """
-        INSERT sorgusu çalıştırır ve eklenen kaydın ID'sini döndürür
+        INSERT sorgusu çalıştırma ve eklenen kaydın kimliğini döndürme
+        fonksiyonu
 
-        Args:
+        Parametreler:
             query (str): SQL sorgusu
             params (tuple, optional): Sorgu parametreleri
 
-        Returns:
-            int: Eklenen kaydın ID'si
+        Döndürülenler:
+            int: Eklenen kaydın kimliği
         """
         try:
             with self.get_cursor(dictionary=False) as cursor:
@@ -171,17 +182,20 @@ class DatabaseConnection:
             logger.error(f"Insert sorgu hatası: {e}")
             raise
 
+    # UPDATE/DELETE sorgusu çalıştırma ve etkilenen satır sayısını
+    # döndürme fonksiyonu
     def execute_update(
             self, query: str, params: Optional[Tuple] = None
     ) -> int:
         """
-        UPDATE/DELETE sorgusu çalıştırır ve etkilenen satır sayısını döndürür
+        UPDATE/DELETE sorgusu çalıştırma ve etkilenen
+        satır sayısını döndürme fonksiyonu
 
-        Args:
+        Parametreler:
             query (str): SQL sorgusu
             params (tuple, optional): Sorgu parametreleri
 
-        Returns:
+        Döndürülenler:
             int: Etkilenen satır sayısı
         """
         try:
@@ -192,17 +206,19 @@ class DatabaseConnection:
             logger.error(f"Update/Delete sorgu hatası: {e}")
             raise
 
+    # Aynı sorguyu birden fazla parametre ile çalıştırma fonksiyonu
     def execute_many(
             self, query: str, params_list: List[Tuple]
     ) -> int:
         """
-        Aynı sorguyu birden fazla parametre ile çalıştırır
+        Aynı sorguyu birden fazla parametre ile çalıştırma
+        fonksiyonu
 
-        Args:
+        Parametreler:
             query (str): SQL sorgusu
             params_list (List[Tuple]): Parametre listesi
 
-        Returns:
+        Döndürülenler:
             int: Etkilenen toplam satır sayısı
         """
         try:
@@ -213,17 +229,19 @@ class DatabaseConnection:
             logger.error(f"ExecuteMany sorgu hatası: {e}")
             raise
 
+    # SELECT sorgusu çalıştırır ve tek satır döndürme fonksiyonu
     def fetch_one(
         self, query: str, params: Optional[Tuple] = None
     ) -> Optional[Dict[str, Any]]:
         """
-        SELECT sorgusu çalıştırır ve tek satır döndürür
+        SELECT sorgusu çalıştırır ve tek satır döndürme
+        fonksiyonu
 
-        Args:
+        Parametreler:
             query (str): SQL sorgusu
             params (tuple, optional): Sorgu parametreleri
 
-        Returns:
+        Döndürülenler:
             Dict[str, Any] | None: Sorgu sonucu veya None
         """
         try:
@@ -235,51 +253,53 @@ class DatabaseConnection:
             raise
 
 
-# Singleton instance
+# Tekil örnek
 db = DatabaseConnection()
 
 
+# Veri tabanı bağlantısını sınama ve başlatma fonksiyonu
 def init_database():
     """
-    Veritabanı bağlantısını test eder ve başlatır
+    Veri tabanı bağlantısını sınama ve başlatma fonksiyonu
 
-    Returns:
+    Döndürülenler:
         bool: Başlatma başarılıysa True
     """
     try:
         if not db.test_connection():
-            logger.error("Veritabanı bağlantısı kurulamadı!")
+            logger.error("Veri tabanı bağlantısı kurulamadı!")
             return False
 
-        logger.info("Veritabanı başarıyla başlatıldı!")
+        logger.info("Veri tabanı başarıyla başlatıldı!")
         return True
     except Exception as e:
-        logger.error(f"Veritabanı başlatma hatası: {e}")
+        logger.error(f"Veri tabanı başlatma hatası: {e}")
         return False
 
 
+# VVeri tabanı örneğini döndürme fonksiyonu
 def get_db():
     """
-    Veritabanı instance'ını döndürür
+    Veri tabanı örneğini döndürme fonksiyonu
 
-    Returns:
-        DatabaseConnection: Veritabanı bağlantı nesnesi
+    Döndürülenler:
+        DatabaseConnection: Veri tabanı bağlantı nesnesi
     """
     return db
 
 
-# Yardımcı fonksiyonlar
+# SQL enjektesine karşı sözcesi güvenli hale getirme fonksiyonu
 def escape_string(
         value: str
 ) -> str:
     """
-    SQL injection'a karşı string'i güvenli hale getirir
+    SQL injection'a karşı  sözcesi güvenli hale getirme fonksiyonu
 
-    Args:
-        value (str): Temizlenecek string
+    Parametreler:
+        value (str): Temizlenecek sözce
 
-    Returns:
-        str: Temizlenmiş string
+    Döndürülenler:
+        str: Temizlenmiş sözce
     """
     if not isinstance(value, str):
         return str(value)
@@ -288,17 +308,18 @@ def escape_string(
     return value.replace("'", "''").replace("\\", "\\\\")
 
 
+# WHERE şartlarını oluşturma fonksiyonu
 def build_where_clause(
         conditions: Dict[str, Any]
 ) -> Tuple[str, Tuple]:
     """
-    WHERE şartlarını oluşturur
+    WHERE şartlarını oluşturma fonksiyonu
 
-    Args:
+    Parametreler:
         conditions (Dict[str, Any]): Şart koşulları
 
-    Returns:
-        Tuple[str, Tuple]: WHERE clause ve parametreler
+    Döndürülenler:
+        Tuple[str, Tuple]: WHERE cümlesi ve parametreler
     """
     if not conditions:
         return "", ()
@@ -314,7 +335,7 @@ def build_where_clause(
     return where_clause, tuple(params)
 
 
-# API Anahtar Yönetimi Fonksiyonları
+# API anahtar yönetimi için yardımcı sınıf fonksiyonu
 class APIKeyManager:
     """API anahtar yönetimi için yardımcı sınıf"""
 
@@ -352,17 +373,20 @@ class APIKeyManager:
             return ""
 
 
+# Kullanıcının Gemini API anahtarını veri tabanında
+# şifreli olarak saklama fonksiyonu
 def store_api_key(
         user_id: int, api_key: str
 ) -> bool:
     """
-    Kullanıcının Gemini API anahtarını veritabanında şifreli olarak saklar
+    Kullanıcının Gemini API anahtarını veri tabanında şifreli olarak
+    saklama fonksiyonu
 
-    Args:
+    Parametreler:
         user_id (int): Kullanıcı ID'si
         api_key (str): API anahtarı
 
-    Returns:
+    Döndürülenler:
         bool: İşlem başarılı ise True
     """
     try:
@@ -382,7 +406,7 @@ def store_api_key(
         if not encrypted_key:
             return False
 
-        # Önce mevcut kaydı kontrol et
+        # Önce mevcut kaydı denetle
         existing = db.fetch_one(
             "SELECT id FROM api_keys WHERE user_id = %s",
             (user_id,),
@@ -415,16 +439,19 @@ def store_api_key(
         return False
 
 
+# Kullanıcının Gemini API anahtarını şifreli veri tabanından alma ve
+# çözme fonksiyonu
 def get_api_key(
         user_id: int
 ) -> Optional[str]:
     """
-    Kullanıcının Gemini API anahtarını şifreli veritabanından alır ve çözer
+    Kullanıcının Gemini API anahtarını şifreli veri tabanından alma ve
+    çözme fonksiyonu
 
-    Args:
+    Parametreler:
         user_id (int): Kullanıcı ID'si
 
-    Returns:
+    Döndürülenler:
         Optional[str]: Çözülmüş API anahtarı veya None
     """
     try:
@@ -442,11 +469,12 @@ def get_api_key(
         return False
 
 
+# Başlangıç veri tabanı MariaDB'ye uygulama fonksiyonu
 def initialize_database_schema():
     """
-    database_schema.sql dosyasındaki tüm SQL
-     komutlarını MariaDB'ye uygular.
-    Kurulum sırasında çağrıldığında veritabanı ve
+    Başlangıç veri tabanı MariaDB'ye uygulama fonksiyonu
+
+    Kurulum sırasında çağrıldığında Veri tabanı ve
      tüm tablolar otomatik olarak oluşturulur.
     """
 
@@ -703,23 +731,24 @@ def initialize_database_schema():
                                f"hata: {exc}\nKomut: {statement[:200]}...")
         cursor.close()
         connection.close()
-        logger.info("Veritabanı şeması başarıyla uygulandı.")
+        logger.info("Veri tabanı şeması başarıyla uygulandı.")
         return True
     except Exception as exc:
-        logger.error(f"Veritabanı şeması oluşturulamadı: {exc}")
+        logger.error(f"Veri tabanı şeması oluşturulamadı: {exc}")
         return False
 
 
+# Kullanıcının Gemini API anahtarını silme fonksiyonu
 def delete_api_key(
         user_id: int
 ) -> bool:
     """
-    Kullanıcının Gemini API anahtarını siler
+    Kullanıcının Gemini API anahtarını silme fonksiyonu
 
-    Args:
+    Parametreler:
         user_id (int): Kullanıcı ID'si
 
-    Returns:
+    Döndürülenler:
         bool: İşlem başarılı ise True
     """
     try:
@@ -739,22 +768,23 @@ def delete_api_key(
         return False
 
 
+# Sistem yapılandırması değeri kaydetme fonksiyonu
 def set_system_config(
         key: str, value: str, config_type: str = "string"
 ) -> bool:
     """
-    Sistem konfigürasyon değeri kaydeder
+    Sistem yapılandırması değeri kaydetme fonksiyonu
 
-    Args:
-        key (str): Konfigürasyon anahtarı
+    Parametreler:
+        key (str): Yapılandırma anahtarı
         value (str): Değer
         config_type (str): Değer türü
 
-    Returns:
+    Döndürülenler:
         bool: İşlem başarılı ise True
     """
     try:
-        # Önce mevcut kaydı kontrol et
+        # Önce mevcut kaydı denetle
         existing = db.fetch_one(
             "SELECT id FROM system_config WHERE config_key = %s", (key,)
         )
@@ -779,18 +809,19 @@ def set_system_config(
         return success
 
     except Exception as e:
-        logger.error(f"Sistem konfigürasyon kaydetme hatası: {e}")
+        logger.error(f"Sistem yapılandırması kaydetme hatası: {e}")
         return False
 
 
+# Sistem yapılandırma değerini alma fonksiyonu
 def get_system_config(key: str) -> Optional[str]:
     """
-    Sistem konfigürasyon değerini alır
+    Sistem yapılandırma değerini alma fonksiyonu
 
-    Args:
-        key (str): Konfigürasyon anahtarı
+    Parametreler:
+        key (str): Yapılandırma anahtarı
 
-    Returns:
+    Döndürülenler:
         Optional[str]: Konfigürasyon değeri veya None
     """
     try:
@@ -801,18 +832,19 @@ def get_system_config(key: str) -> Optional[str]:
         )
         return result["config_value"] if result else None
     except Exception as e:
-        logger.error(f"Sistem konfigürasyon alma hatası: {e}")
+        logger.error(f"Sistem yapılandırma alma hatası: {e}")
         return None
 
 
+# Kullanıcı ayarlarını alma fonksiyonu
 def get_user_settings(user_id: int) -> Optional[Dict]:
     """
-    Kullanıcının ayarlarını alır
+    Kullanıcının ayarlarını alma fonksiyonu
 
-    Args:
+    Parametreler:
         user_id (int): Kullanıcı ID'si
 
-    Returns:
+    Döndürülenler:
         Optional[Dict]: Kullanıcı ayarları veya None
     """
     try:
@@ -841,6 +873,7 @@ def get_user_settings(user_id: int) -> Optional[Dict]:
         return None
 
 
+# Kullanıcının ayarlarını kaydetme fonksiyonu
 def save_user_settings(
     user_id: int,
     gemini_api_key: str = None,
@@ -848,19 +881,19 @@ def save_user_settings(
     dark_mode: bool = None,
 ) -> bool:
     """
-    Kullanıcının ayarlarını kaydeder veya günceller
+    Kullanıcının ayarlarını kaydetme fonksiyonu
 
-    Args:
+    Parametreler:
         user_id (int): Kullanıcı ID'si
         gemini_api_key (str, optional): Gemini API anahtarı
         gemini_model (str, optional): Gemini model adı
         dark_mode (bool, optional): Gece modu durumu
 
-    Returns:
+    Döndürülenler:
         bool: İşlem başarılıysa True, değilse False
     """
     try:
-        # Önce mevcut kaydı kontrol et
+        # Önce mevcut kaydı denetle
         existing = db.fetch_one(
             "SELECT id FROM user_settings WHERE user_id = %s", (user_id,)
         )
@@ -917,20 +950,22 @@ def save_user_settings(
         return False
 
 
+# Kullanıcının Gemini API anahtarını alma fonksiyonu
 def get_user_gemini_api_key(user_id: int) -> Optional[str]:
     """
-    Kullanıcının Gemini API anahtarını alır.
+    Kullanıcının Gemini API anahtarını alma fonksiyonu
+
     Eğer kullanıcının kendi anahtarı yoksa
     sistem varsayılan anahtarını döndürür.
 
-    Args:
+    Parametreler:
         user_id (int): Kullanıcı ID'si
 
-    Returns:
+    Döndürülenler:
         Optional[str]: API anahtarı veya None
     """
     try:
-        # Önce kullanıcının kendi anahtarını kontrol et
+        # Önce kullanıcının kendi anahtarını denetle
         result = db.fetch_one(
             "SELECT gemini_api_key FROM user_settings "
             "WHERE user_id = %s AND gemini_api_key IS NOT NULL",

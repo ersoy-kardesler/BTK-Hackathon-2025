@@ -3,26 +3,13 @@ BTK Hackathon 2025 - Eğitim Oluşturma Sınama Uygulaması
 
 Telif Hakkı © 2025 Ersoy Kardeşler
 Bütün hakları saklıdır.
-
-Bu dosya, eğitim oluşturma işlevini sınar.
-
-Kullanım:
-    python test_generating_education.py
-
-Gereksinimler:
-- config.ini dosyasında GEMINI_API_KEY tanımlı olmalı
-- app.py ile aynı dizinde bulunmalı
-- Internet bağlantısı (API çağrıları için)
-- MariaDB veritabanı bağlantısı
-
-Yazarlar: Ersoy Kardeşler
 """
 
 # Gerekli kütüphanelerin içe aktarılması
 import google.generativeai as genai
 
 from config.config_loader import load_config
-from database.database_connection import get_system_config, init_database
+
 from education.generate_education import generate_education
 
 
@@ -31,10 +18,6 @@ def get_gemini_model():
     """
     Google Gemini API modelini yapılandırır ve döndürür.
     """
-    # Veritabanını başlat
-    if not init_database():
-        print("HATA: Veritabanı bağlantısı kurulamadı!")
-        return None
 
     # Konfigürasyonu yükle
     config = load_config()

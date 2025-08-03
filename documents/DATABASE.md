@@ -1,8 +1,8 @@
 # BTK Hackathon 2025 - MariaDB ve Kimlik Doğrulama Entegrasyonu
 
-Bu doküman, projeye eklenen veritabanı yapısı hakkında bilgi verir.
+Bu doküman, projeye eklenen veri tabanı yapısı hakkında bilgi verir.
 
-## Veritabanı Yapısı
+## Veri Tabanı Yapısı
 
 ### Tablolar
 
@@ -26,7 +26,7 @@ Bu doküman, projeye eklenen veritabanı yapısı hakkında bilgi verir.
 5. **user_activity_logs** - Kullanıcı aktivite logları
    - id, user_id, action, details, ip_address, user_agent, created_at
 
-6. **password_reset_tokens** - Şifre sıfırlama tokenları
+6. **password_reset_tokens** - Parola sıfırlama işaretçileri
    - id, user_id, token, expires_at, created_at
 
 7. **api_keys** - API anahtarları

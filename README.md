@@ -21,7 +21,7 @@ Bu proje, Google Gemini AI ile eğitim içerikleri oluşturabilen bir Flask web 
 
 Tüm teknik detaylar ve kullanım örnekleri için ilgili belge dosyalarına bakınız.
 
----
+## Lisans
 
 Telif Hakkı © 2025 Ersoy Kardeşler
 

@@ -17,6 +17,8 @@ def generate_education(
     model=None
 ):
     """
+    Eğitimi oluşturan fonksiyon
+
     Belirtilen konu için eğitim, ders planı, ders içerikleri ve
     sınav soruları oluşturur ve hepsini bir defada yazdırır.
     """

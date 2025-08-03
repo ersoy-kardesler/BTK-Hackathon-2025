@@ -1,10 +1,15 @@
 """
-Flask kimlik doğrulama dekoratörleri ve yardımcı fonksiyonlar
+BTK Hackathon 2025 - Flask Kimlik Doğrulama ve Oturum Modülü
 
-Bu modül Flask route'ları için kimlik doğrulama dekoratörleri
-ve session yönetimi fonksiyonları sağlar.
+Telif Hakkı © 2025 Ersoy Kardeşler
+Bütün hakları saklıdır.
+
+Bu modül Flask yönlendirmeleri için kimlik doğrulama ve
+oturum yönetimi fonksiyonları sağlar.
 """
 
+
+# Gerekli kütüphanelerin içe aktarılması
 import logging
 from functools import wraps
 from flask import request, jsonify, session, g
@@ -14,34 +19,35 @@ from auth.auth_manager import get_auth, get_session_manager
 
 logger = logging.getLogger(__name__)
 
-# Auth ve session manager'ı al
+# Kullanıcı doğrulamayı ve oturum yöneticisini al
 auth_manager = get_auth()
 session_manager = get_session_manager()
 
 
+# İstekten oturum işaretçisini alma fonksiyonu
 def get_session_token() -> Optional[str]:
     """
-    Request'ten session token'ını alır
+    İstekten oturum işaretçisini alma fonksiyonu
 
-    Token sırasıyla şu yerlerden aranır:
-    1. Authorization header (Bearer token)
-    2. session cookie
-    3. request form data
-    4. request args
+    Oturum işaretçisi sırasıyla şu yerlerden aranır:
+    1. Kullanıcı doğrulama başlığı
+    2. Oturum çerezi
+    3. JSON veya form verisi isteği
+    4. Parametre isteği
 
-    Returns:
-        str | None: Session token veya None
+    Döndürülenler:
+        str | None: Oturum işaretçisi veya None
     """
-    # Authorization header'dan
+    # Kullanıcı doğrulama başlığından
     auth_header = request.headers.get("Authorization")
     if auth_header and auth_header.startswith("Bearer "):
         return auth_header.split(" ")[1]
 
-    # Session cookie'den
+    # Oturum çerezinden
     if "session_token" in session:
         return session["session_token"]
 
-    # Form data'dan
+    # Form verisinden
     if request.is_json:
         data = request.get_json()
         if data and "session_token" in data:
@@ -49,23 +55,25 @@ def get_session_token() -> Optional[str]:
     elif request.form.get("session_token"):
         return request.form.get("session_token")
 
-    # Query parameter'dan
+    # Parametre isteğinden
     if request.args.get("session_token"):
         return request.args.get("session_token")
 
     return None
 
 
+# İstemci bilgilerini alma fonksiyonu
 def get_client_info() -> Dict[str, str]:
     """
-    İstemci bilgilerini (IP, User Agent) alır
+    İstemci bilgilerini alma fonksiyonu
 
-    Returns:
+    Döndürülenler:
         Dict[str, str]: İstemci bilgileri
     """
-    # Proxy arkasındaysa gerçek IP'yi al
+    # Proxy arkasındaysa gerçek IP adresini al
     ip_address = request.headers.get(
-        "X-Forwarded-For", request.headers.get("X-Real-IP", request.remote_addr)
+        "X-Forwarded-For", request.headers.get("X-Real-IP",
+                                               request.remote_addr)
     )
     if ip_address and "," in ip_address:
         ip_address = ip_address.split(",")[0].strip()
@@ -75,11 +83,12 @@ def get_client_info() -> Dict[str, str]:
     return {"ip_address": ip_address, "user_agent": user_agent}
 
 
+# Giriş yapmış kullanıcı gerektiren yönelndirmeler için denetim fonksiyonu
 def login_required(f):
     """
-    Giriş yapmış kullanıcı gerektiren route'lar için dekoratör
+    Giriş yapmış kullanıcı gerektiren yönelndirmeler için denetim fonksiyonu
 
-    Usage:
+    Kullanım:
         @app.route('/protected')
         @login_required
         def protected_route():
@@ -122,14 +131,15 @@ def login_required(f):
     return decorated_function
 
 
+# Belirli rollere sahip kullanıcılar için denetim fonksiyonu
 def role_required(*allowed_roles):
     """
-    Belirli rollere sahip kullanıcılar için dekoratör
+    Belirli rollere sahip kullanıcılar için denetim fonksiyonu
 
-    Args:
+    Parametreler:
         allowed_roles: İzin verilen roller
 
-    Usage:
+    Kullanım:
         @app.route('/admin')
         @login_required
         @role_required('admin', 'normal')
@@ -172,13 +182,15 @@ def role_required(*allowed_roles):
     return decorator
 
 
+# İsteğe bağlı kimlik doğrulama detimi fonksiyonu
 def optional_auth(f):
     """
-    İsteğe bağlı kimlik doğrulama dekoratörü
+    İsteğe bağlı kimlik doğrulama detimi fonksiyonu
+
     Giriş yapmış kullanıcı varsa g.current_user'a ekler,
     yoksa None olarak bırakır
 
-    Usage:
+    Kullanım:
         @app.route('/public')
         @optional_auth
         def public_route():
@@ -204,12 +216,14 @@ def optional_auth(f):
     return decorated_function
 
 
+# API anahtarı gerektiren uç noktalar için denetim fonksiyonu
 def api_key_required(f):
     """
-    API anahtarı gerektiren endpoint'ler için dekoratör
-    Hem session token hem de API key kontrolü yapar
+    API anahtarı gerektiren uç noktalar için denetim fonksiyonu
 
-    Usage:
+    Hem oturum işlaretçisi hem de API anahtarı denetimi yapar
+
+    Kullanım:
         @app.route('/api/data')
         @api_key_required
         def api_data():
@@ -218,13 +232,13 @@ def api_key_required(f):
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Session token kontrolü
+        # Oturum işaretçisi denetimi
         token = get_session_token()
         if not token:
             return (
                 jsonify(
                     {
-                        "error": "API anahtarı veya session token gerekli",
+                        "error": "API anahtarı veya oturum işaretçisi gerekli",
                         "code": "API_KEY_REQUIRED",
                     }
                 ),
@@ -236,7 +250,7 @@ def api_key_required(f):
             return (
                 jsonify(
                     {
-                        "error": "Geçersiz API anahtarı veya session",
+                        "error": "Geçersiz API anahtarı veya oturum",
                         "code": "INVALID_API_KEY",
                     }
                 ),
@@ -251,14 +265,14 @@ def api_key_required(f):
     return decorated_function
 
 
-# Flask utility fonksiyonları
+# Kullanıcıyı Flask oturumuna giriş yapma fonksiyonu
 def login_user_session(user_info: Dict[str, Any], session_token: str) -> None:
     """
-    Kullanıcıyı Flask session'ına giriş yapar
+    Kullanıcıyı Flask oturumuna giriş yapma fonksiyonu
 
-    Args:
+    Parametreler:
         user_info (Dict[str, Any]): Kullanıcı bilgileri
-        session_token (str): Session token
+        session_token (str): Oturum işaretçisi
     """
     session["session_token"] = session_token
     session["user_id"] = user_info["id"]
@@ -267,19 +281,22 @@ def login_user_session(user_info: Dict[str, Any], session_token: str) -> None:
     session.permanent = True
 
 
+# Kullanıcıyı Flask oturumundan çıkarma fonksiyonu
 def logout_user_session() -> None:
     """
-    Kullanıcıyı Flask session'ından çıkarır
+    Kullanıcıyı Flask oturumundan çıkarma fonksiyonu
     """
     session.clear()
 
 
+# Güvenli şekilde mevcut kullanıcıyı alma fonksiyonu
 def get_current_user_safe() -> Optional[Dict[str, Any]]:
     """
-    Güvenli şekilde mevcut kullanıcıyı alır
+    Güvenli şekilde mevcut kullanıcıyı alma fonksiyonu
+
     Hata durumunda None döndürür
 
-    Returns:
+    Döndürülenler:
         Dict[str, Any] | None: Kullanıcı bilgileri
     """
     try:
@@ -296,24 +313,27 @@ def get_current_user_safe() -> Optional[Dict[str, Any]]:
         return None
 
 
+# Kullanıcının giriş yapıp yapmadığını denetleme fonksiyonu
 def is_user_authenticated() -> bool:
     """
-    Kullanıcının giriş yapıp yapmadığını kontrol eder
+    Kullanıcının giriş yapıp yapmadığını denetleme fonksiyonu
 
-    Returns:
+    Döndürülenler:
         bool: Giriş yapmışsa True
     """
     return get_current_user_safe() is not None
 
 
+# Mevcut kullanıcının belirli role sahip olup olmadığını denetleme fonksiyonu
 def has_role(required_role: str) -> bool:
     """
-    Mevcut kullanıcının belirli role sahip olup olmadığını kontrol eder
+    Mevcut kullanıcının belirli role sahip olup olmadığını denetleme
+    fonksiyonu
 
-    Args:
+    Parametreler:
         required_role (str): Gerekli rol
 
-    Returns:
+    Döndürülenler:
         bool: Role sahipse True
     """
     user = get_current_user_safe()
@@ -323,14 +343,17 @@ def has_role(required_role: str) -> bool:
     return user.get("role") == required_role
 
 
+# Mevcut kullanıcının herhangi bir role sahip olup olmadığını denetleme
+# fonksiyonu
 def has_any_role(required_roles: List[str]) -> bool:
     """
-    Mevcut kullanıcının herhangi bir role sahip olup olmadığını kontrol eder
+    Mevcut kullanıcının herhangi bir role sahip olup olmadığını denetleme
+    fonksiyonu
 
-    Args:
+    Parametreler:
         required_roles (List[str]): Gerekli roller
 
-    Returns:
+    Döndürülenler:
         bool: Herhangi bir role sahipse True
     """
     user = get_current_user_safe()
@@ -340,43 +363,51 @@ def has_any_role(required_roles: List[str]) -> bool:
     return user.get("role") in required_roles
 
 
-# Response helper'ları
+# Yetkisiz yanıtı döndürürme fonksiyonu
 def unauthorized_response(message: str = "Giriş yapmanız gerekiyor"):
     """
-    401 Unauthorized response döndürür
+    Yetkisiz yanıtı döndürürme fonksiyonu
 
-    Args:
+    HTTP 401 yanıtı döndürür.
+
+    Parametreler:
         message (str): Hata mesajı
 
-    Returns:
+    Döndürülenler:
         Response: Flask response
     """
     return jsonify({"error": message, "code": "UNAUTHORIZED"}), 401
 
 
+# Reddedilen yanıtı döndürme fonksiyonu
 def forbidden_response(message: str = "Bu işlem için yetkiniz yok"):
     """
-    403 Forbidden response döndürür
+    Reddedilen yanıtı döndürme fonksiyonu
 
-    Args:
+    HTTP 403 yanıtı döndürür.
+
+    Parametreler:
         message (str): Hata mesajı
 
-    Returns:
+    Döndürülenler:
         Response: Flask response
     """
     return jsonify({"error": message, "code": "FORBIDDEN"}), 403
 
 
+# Başarılı yanıtı döndürme fonksiyonu
 def success_response(data: Any = None, message: str = "İşlem başarılı"):
     """
-    200 Success response döndürür
+    Başarılı yanıtı döndürme fonksiyonu
 
-    Args:
-        data (Any): Response verisi
-        message (str): Başarı mesajı
+    HTTP 200 yanıtı döndürür.
 
-    Returns:
-        Response: Flask response
+    Parametreler:
+        data (Any): Yanıt verisi
+        message (str): Başarı iletisi
+
+    Döndürülenler:
+        Response: Flask yanıtı
     """
     response = {"success": True, "message": message}
 

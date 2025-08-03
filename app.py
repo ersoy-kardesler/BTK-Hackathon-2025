@@ -1,32 +1,15 @@
 """
 BTK Hackathon 2025 - Eğitim Asistanı Uygulaması
 
-Bu uygulama, Google Gemini AI kullanarak eğitim içeriği oluşturan bir Flask web
-uygulamasıdır.
+Telif Hakkı © 2025 Ersoy Kardeşler
+Bütün hakları saklıdır.
 
-Özellikler:
-    - Eğitim oluşturma
-    - Ödev değerlendirme
-    - Kullanıcı kimlik doğrulama (MariaDB)
-    - Oturum yönetimi
-
-Gereksinimler:
-    - Python 3.8+
-    - Flask
-    - google-generativeai
-    - python-dotenv
-    - mysql-connector-python
-    - bcrypt
-
-Kullanım:
-    1. .env dosyasında GEMINI_API_KEY ve veritabanı ayarlarını tanımlayın
-    2. requirements.txt'deki paketleri yükleyin
-    3. database_schema.sql'i MariaDB'de çalıştırın
-    4. python app.py ile uygulamayı başlatın
-
-Yazarlar: Ersoy Kardeşler
+Bu uygulama, Google Gemini AI ile eğitim içeriği oluşturma ve
+ödev değerlendirme özellikleri sunan bir Flask web uygulamasıdır.
 """
 
+
+# Gerekli kütüphanelerin içe aktarılması
 import re
 import logging
 import google.generativeai as genai
@@ -45,7 +28,9 @@ from auth.flask_auth import (
     success_response,
     role_required,
 )
+
 from config.config_loader import load_config, get_secret_key
+
 from database.database_connection import (
     init_database,
     initialize_database_schema,
@@ -55,13 +40,15 @@ from database.database_connection import (
     save_user_settings,
     get_user_gemini_api_key,
 )
+
 from education.generate_education import generate_education
 from education.evaluate_assignment import evaluate_assignment
 
-# Konfigürasyon ayarlarını yükle
+# KYapılandırma ayarlarını yükle
 config = load_config()
 
 
+# Gemini modeli alma fonsiyonu
 def get_user_gemini_model(user_id: int):
     """
     Kullanıcının Gemini modelini ve API anahtarını alır ve modeli başlatır.
@@ -90,35 +77,41 @@ def get_user_gemini_model(user_id: int):
         return None, None
 
 
-# Logging yapılandırması
+# Günlük yapılandırması
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Auth manager'ı al
+# Kimlik yönetimini al
 auth_manager = get_auth()
 
 # Flask uygulamasını başlat
 app = Flask(__name__)
 
-# Konfigürasyonu Flask uygulamasına uygula
+# Yapılandırmayı Flask uygulamasına uygula
 app.secret_key = get_secret_key()
 app.config.update(config)
 
-# Session ayarları
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=24)
-app.config["SESSION_COOKIE_SECURE"] = False  # HTTPS'de True yapın
-app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+# Oturum ayarları
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(
+    hours=int(config.get("SESSION_LIFETIME_HOURS", 24))
+)
+app.config["SESSION_COOKIE_SECURE"] = config.get("SESSION_COOKIE_SECURE",
+                                                 "False").lower() == "true"
+app.config["SESSION_COOKIE_HTTPONLY"] = config.get("SESSION_COOKIE_HTTPONLY",
+                                                   "True").lower() == "true"
 
-# Veritabanını başlat
+# Veri tabanını başlat
 if not init_database():
-    print("HATA: Veritabanı bağlantısı kurulamadı!")
-    print("Veritabanı şeması oluşturulmaya çalışılıyor...")
+    print("HATA: Veri tabanı bağlantısı kurulamadı!")
+    print("Veri tabanı şeması oluşturulmaya çalışılıyor...")
     try:
         if initialize_database_schema():
-            print("Veritabanı şeması başarıyla oluşturuldu. Uygulama yeniden başlatılıyor...")
+            print("Veri tabanı şeması başarıyla oluşturuldu.")
+            print("Uygulama yeniden başlatılıyor...")
             if not init_database():
-                print("Yine de veritabanı bağlantısı kurulamadı! Lütfen config.ini dosyasında veritabanı ayarlarını kontrol edin:")
+                print("Yine de ver itabanı bağlantısı kurulamadı!")
+                print("Lütfen config.ini dosyasında "
+                      "veri tabanı ayarlarını kontrol edin:")
                 print("- DB_HOST (varsayılan: localhost)")
                 print("- DB_PORT (varsayılan: 3306)")
                 print("- DB_USER (varsayılan: root)")
@@ -126,32 +119,31 @@ if not init_database():
                 print("- DB_NAME (varsayılan: btk_hackathon_2025)")
                 exit(1)
         else:
-            print("Veritabanı şeması oluşturulamadı! Lütfen config.ini dosyasında veritabanı ayarlarını kontrol edin.")
+            print("Veri tabanı şeması oluşturulamadı!")
+            print("Lütfen config.ini dosyasında"
+                  "veri tabanı ayarlarını kontrol edin.")
+
             exit(1)
     except Exception as e:
-        print(f"Veritabanı şeması oluşturulurken hata oluştu: {e}")
+        print(f"Veri tabanı şeması oluşturulurken hata oluştu: {e}")
         exit(1)
 
 # Google Gemini API'yi yapılandır
-# Artık API anahtarı kullanıcı bazında alınacak, sistem başlangıcında genel API
-# kontrolü yapmıyoruz
-# API anahtarını sistem konfigürasyonundan al (sadece fallback için)
 system_api_key = get_system_config("GEMINI_API_KEY")
 if not system_api_key:
-    # Eğer veritabanında yoksa config.ini dosyasından al ve kaydet
+    # Eğer veri tabanında yoksa config.ini dosyasından al ve kaydet
     system_api_key = config.get("GEMINI_API_KEY")
     if system_api_key:
         from database.database_connection import set_system_config
 
         set_system_config("GEMINI_API_KEY", system_api_key)
-        print("Sistem Gemini API anahtarı veritabanına kaydedildi.")
+        print("Sistem Gemini API anahtarı veri tabanına kaydedildi.")
 
-# Gemini AI modelini yapılandır (model başlatması kullanıcı bazında yapılacak)
 print("Google Gemini API modülü yüklendi!")
-print("API anahtarları kullanıcı bazında yönetilecek.")
+print("API anahtarları kullanıcı temelinde yönetilecek.")
 
 
-# Ana sayfaya (/) gelen istekleri karşıla
+# Ana sayfa yönelndirmesi
 @app.route("/")
 @optional_auth
 def index():
@@ -170,12 +162,12 @@ def index():
         - Static dosyalar (CSS, JS) otomatik olarak yüklenir
         - İsteğe bağlı kimlik doğrulama desteklenir
     """
-    # Kullanıcı bilgilerini template'e gönder
+    # Kullanıcı bilgilerini taslağa gönder
     current_user = get_current_user_safe()
     return render_template("index.html", current_user=current_user)
 
 
-# Eğitim oluşturma sayfası (GET)
+# Eğitim oluşturma sayfası yönlendirmesi
 @app.route("/education", methods=["GET"])
 @login_required
 def education():
@@ -186,14 +178,26 @@ def education():
     return render_template("education.html", current_user=g.current_user)
 
 
-# Eğitim oluşturma API endpoint (POST)
+# Ödev değerlendirme sayfası yönelndirmesi
+@app.route("/assignment_evaluate", methods=["GET"])
+@login_required
+def assignment_evaluate():
+    """
+    Ödev değerlendirme sayfası - Formu gösterir.
+    Giriş yapmış kullanıcılar gereklidir.
+    """
+    return render_template("assignment_evaluate.html",
+                           current_user=g.current_user)
+
+
+# Eğitim oluşturma yönelndirmesi
 @app.route("/api/education", methods=["POST"])
 @login_required
 def api_education():
     """
-    Eğitim oluşturma API endpoint'i.
+    Eğitim oluşturma fonksiyonu
     JSON formatında bilgi alır ve eğitim oluşturur.
-    Giriş yapmış kullanıcılar gereklidir.
+    Kullanıcı girişi yapmak gereklidir.
     """
     try:
         # JSON verisini al
@@ -221,7 +225,7 @@ def api_education():
         # Eğitim oluştur
         education_result = generate_education(subject, model=model)
 
-        # Veritabanına kaydet (isteğe bağlı)
+        # Veri tabanına kaydet (isteğe bağlı)
         try:
             db = get_db()
 
@@ -233,8 +237,8 @@ def api_education():
                 query, (g.current_user["user_id"], subject, education_result)
             )
         except Exception as db_error:
-            # Veritabanı hatası logla ama devam et
-            print(f"Eğitim veritabanına kaydedilemedi: {db_error}")
+            # Veri tabanı hatasını günlüğe yaz, ancak devam et
+            print(f"Eğitim veri tabanına kaydedilemedi: {db_error}")
 
         return jsonify(
             {
@@ -256,26 +260,14 @@ def api_education():
         )
 
 
-# Ödev değerlendirme sayfası (GET)
-@app.route("/assignment_evaluate", methods=["GET"])
-@login_required
-def assignment_evaluate():
-    """
-    Ödev değerlendirme sayfası - Formu gösterir.
-    Giriş yapmış kullanıcılar gereklidir.
-    """
-    return render_template("assignment_evaluate.html",
-                           current_user=g.current_user)
-
-
-# Ödev değerlendirme API endpoint (POST)
+# Ödev değerlendirme yönelndirmesi
 @app.route("/api/assignment_evaluate", methods=["POST"])
 @login_required
 def api_assignment_evaluate():
     """
-    Ödev değerlendirme API endpoint'i.
-    JSON formatında assignment_text ve criteria alır ve değerlendirme yapar.
-    Giriş yapmış kullanıcılar gereklidir.
+    Ödev değerlendirme fonksiyonu
+    JSON formatında bilgi alır ve değerlendirme yapar
+    Kullanıcı girişi yapmak gereklidir.
     """
     try:
         # JSON verisini al
@@ -309,7 +301,7 @@ def api_assignment_evaluate():
                                                 criteria,
                                                 model=model)
 
-        # Veritabanına kaydet (isteğe bağlı)
+        # Veri tabanına kaydet (isteğe bağlı)
         try:
             db = get_db()
 
@@ -336,8 +328,8 @@ def api_assignment_evaluate():
                 ),
             )
         except Exception as db_error:
-            # Veritabanı hatası logla ama devam et
-            print(f"Ödev değerlendirmesi veritabanına"
+            # Veri tabanı hatası logla ama devam et
+            print(f"Ödev değerlendirmesi veri tabanına"
                   "kaydedilemedi: {db_error}")
 
         return jsonify(
@@ -361,39 +353,40 @@ def api_assignment_evaluate():
         )
 
 
-# Giriş ve kayıt sayfaları
+# Kullanıcı girişi sayfası yönelndirmesi
 @app.route("/login", methods=["GET"])
 def login_page():
     """
-    Giriş sayfası
+    Kullanıcı girişi sayfası fonksiyonu
     """
     return render_template("login.html")
 
 
+# Kullanıcı kaydı sayfası yönelndirmesi
 @app.route("/register", methods=["GET"])
 @login_required
 @role_required("admin")
 def register_page():
     """
-    Kayıt sayfası
+    Kullanıcı kaydı sayfası fonksiyonu
     """
     return render_template("register.html")
 
 
+# Kullanıcı çıkışı sayfası yönelndirmesi
 @app.route("/logout", methods=["GET"])
 def logout_page():
     """
-    Çıkış sayfası
+    Kullanıcı çıkışı sayfası fonksiyonu
     """
     return render_template("logout.html")
 
-# =============== AUTH API ENDPOINTS ===============
 
-
+# Kullanıcı girişi yönlendirmesi
 @app.route("/auth/login", methods=["POST"])
 def auth_login():
     """
-    Kullanıcı giriş endpoint'i
+    Kullanıcı girişi fonksiyonu
 
     Request Body:
     {
@@ -453,7 +446,7 @@ def auth_login():
                 401,
             )
 
-        # Flask session'ına kaydet
+        # Flask oturumuna kaydet
         login_user_session(user_info, session_token)
 
         logger.info(
@@ -482,11 +475,12 @@ def auth_login():
         )
 
 
+# Kullanıcı çıkışı yönlendirmesi
 @app.route("/auth/logout", methods=["POST"])
 @login_required
 def auth_logout():
     """
-    Kullanıcı çıkış endpoint'i
+    Kullanıcı çıkış fonksiyonu
 
     Response:
     {
@@ -495,7 +489,7 @@ def auth_logout():
     }
     """
     try:
-        # Session token'ı al
+        # Oturum işaretçisini al
         session_token = get_session_token()
 
         if session_token:
@@ -518,12 +512,13 @@ def auth_logout():
         )
 
 
+# Kullanıcı kaydı yönlendirmesi
 @app.route("/auth/register", methods=["POST"])
 @login_required
 @role_required("admin")
 def auth_register():
     """
-    Kullanıcı kayıt endpoint'i
+    Kullanıcı kayıt fonksiyonu
     """
     try:
         # JSON verisini al
@@ -550,7 +545,7 @@ def auth_register():
                 400,
             )
 
-        # Sadece 'admin' ve 'normal' rolleri veritabanına yazılabilir
+        # Sadece 'admin' ve 'normal' rolleri veri tabanına yazılabilir
         if role not in ["admin", "normal"]:
             role = "normal"
 
@@ -575,11 +570,12 @@ def auth_register():
         )
 
 
+# Kullanıcı profil bilgileri alınma yönlendirmesi
 @app.route("/auth/profile", methods=["GET"])
 @login_required
 def auth_profile():
     """
-    Kullanıcı profil bilgileri endpoint'i
+    Kullanıcı profil bilgileri fonksiyonu
 
     Response:
     {
@@ -611,11 +607,12 @@ def auth_profile():
         500
 
 
+# Kullanıcı parolası değiştirme yönlendirmesi
 @app.route("/auth/change-password", methods=["POST"])
 @login_required
 def auth_change_password():
     """
-    Şifre değiştirme endpoint'i
+    Şifre değiştirme fonksiyonu
 
     Request Body:
     {
@@ -670,10 +667,11 @@ def auth_change_password():
         )
 
 
+# Oturum doğrulama yönlendirmesi
 @app.route("/auth/check-session", methods=["GET"])
 def auth_check_session():
     """
-    Oturum durumu kontrol endpoint'i
+    Oturum doğrulama fonksiyonu
 
     Response:
     {
@@ -727,19 +725,17 @@ def auth_check_session():
         500
 
 
-# =============== USER DATA API ENDPOINTS ===============
-
-
+# Eğitim oluşturma geçmişi yönlendirmesi
 @app.route("/api/user/education-history", methods=["GET"])
 @login_required
 def user_education_history():
     """
-    Kullanıcının eğitim geçmişini getirir
+    Kullanıcının eğitim oluşturma geçmişini getirme fonksiyonu
     """
     try:
         # Sayfalama parametreleri
         page = int(request.args.get("page", 1))
-        limit = min(int(request.args.get("limit", 10)), 50)  # Max 50
+        limit = min(int(request.args.get("limit", 10)), 50)
         offset = (page - 1) * limit
 
         db = get_db()
@@ -790,11 +786,12 @@ def user_education_history():
         500
 
 
+# Ödev değerlendirme geçmişi yönlendirmesi
 @app.route("/api/user/assignment-history", methods=["GET"])
 @login_required
 def user_assignment_history():
     """
-    Kullanıcının ödev değerlendirme geçmişini getirir
+    Kullanıcının ödev değerlendirme geçmişini getirme fonksiyonu
     """
     try:
         # Sayfalama parametreleri
@@ -859,11 +856,12 @@ def user_assignment_history():
     500
 
 
+# İstatistik gösterge paneli yönlendirmesi
 @app.route("/api/user/dashboard-stats", methods=["GET"])
 @login_required
 def user_dashboard_stats():
     """
-    Kullanıcı dashboard istatistikleri
+    İstatistik gösterge paneli fonksiyonu
     """
     try:
         user_id = g.current_user["user_id"]
@@ -929,78 +927,13 @@ def user_dashboard_stats():
         500
 
 
-@app.route("/api/user/toggle-favorite", methods=["POST"])
-@login_required
-def user_toggle_favorite():
-    """
-    Eğitim içeriğini favorilere ekler/çıkarır
-
-    Request Body:
-    {
-        "education_id": 123
-    }
-
-    Response:
-    {
-        "success": true,
-        "data": {
-            "is_favorite": true
-        }
-    }
-    """
-    try:
-        data = request.get_json()
-        if not data or "education_id" not in data:
-            return jsonify({"success": False,
-                            "error": "education_id gerekli"}),
-            400
-
-        education_id = data["education_id"]
-        user_id = g.current_user["user_id"]
-
-        db = get_db()
-
-        # Eğitimin bu kullanıcıya ait olduğunu kontrol et
-        check_query = """
-            SELECT is_favorite FROM education_contents
-             WHERE id = %s AND user_id = %s
-        """
-        education = db.execute_single(check_query, (education_id, user_id))
-
-        if not education:
-            return jsonify({"success": False,
-                            "error": "Eğitim bulunamadı"}),
-            404
-
-        # Favori durumunu tersine çevir
-        new_favorite = not education["is_favorite"]
-
-        update_query = """
-            UPDATE education_contents
-             SET is_favorite = %s
-             WHERE id = %s AND user_id = %s
-        """
-        db.execute_update(update_query,
-                          (new_favorite,
-                           education_id,
-                           user_id))
-
-        return jsonify({"success": True,
-                        "data": {"is_favorite": new_favorite}})
-
-    except Exception as e:
-        logger.error(f"Favori toggle hatası: {e}")
-        return jsonify({"success": False,
-                        "error": "Favori durumu güncellenemedi"}),
-        500
-
-
+# Tüm kullanıcıları listeleme yönelndirmesi
 @app.route("/api/user/admin/users", methods=["GET"])
 @login_required
 @role_required("admin")
 def admin_get_users():
     """
-    Admin - Tüm kullanıcıları listeler
+    Tüm kullanıcıları listeleme fonksiyonu
 
     Query Parameters:
     - page (int): Sayfa numarası
@@ -1087,23 +1020,22 @@ def admin_get_users():
         500
 
 
-# =============== AYARLAR ENDPOINTS ===============
-
-
+# Ayarlar sayfası yönlendirmesi
 @app.route("/settings", methods=["GET"])
 @login_required
 def settings_page():
     """
-    Kullanıcı ayarları sayfası
+    Kullanıcı ayarları sayfası fonksiyonu
     """
     return render_template("settings.html", current_user=g.current_user)
 
 
+# Ayarlar yönelndirmesi
 @app.route("/api/settings", methods=["GET"])
 @login_required
 def api_get_settings():
     """
-    Kullanıcının mevcut ayarlarını getir
+    Kullanıcının mevcut ayarlarını getirme fonksiyonu
 
     Response:
     {
@@ -1144,11 +1076,12 @@ def api_get_settings():
         return jsonify({"success": False, "error": "Ayarlar alınamadı"}), 500
 
 
+# Kullanıcı ayarları yönelndirmesi
 @app.route("/api/settings", methods=["POST"])
 @login_required
 def api_save_settings():
     """
-    Kullanıcının ayarlarını kaydet
+    Kullanıcının ayarları fonksiyonu
 
     Request Body:
     {
@@ -1199,7 +1132,8 @@ def api_save_settings():
         if gemini_model is not None and gemini_model not in valid_models:
             return jsonify({
                 "success": False,
-                "error": f"Geçersiz model. Geçerli modeller: {', '.join(valid_models)}"
+                "error": f"Geçersiz model. Geçerli modeller:"
+                         "{', '.join(valid_models)}"
             }), 400
 
         # Ayarları kaydet
@@ -1224,11 +1158,12 @@ def api_save_settings():
         500
 
 
+# API sınama yönlendirmesi
 @app.route("/api/settings/test-api-key", methods=["POST"])
 @login_required
 def api_test_gemini_key():
     """
-    Gemini API anahtarını test et
+    Gemini API anahtarını sınama fonksiyonu
 
     Request Body:
     {
@@ -1254,12 +1189,12 @@ def api_test_gemini_key():
                             "error": "API anahtarı boş olamaz"}),
             400
 
-        # API anahtarını test et
+        # API anahtarını sına
         try:
             genai.configure(api_key=api_key)
             test_model = genai.GenerativeModel("gemini-2.5-flash")
 
-            # Basit bir test sorgusu gönder
+            # Basit bir sınama sorgusu gönder
             response = test_model.generate_content("Test")
 
             if response and response.text:
@@ -1286,21 +1221,19 @@ def api_test_gemini_key():
             )
 
     except Exception as e:
-        logger.error(f"API anahtarı test etme hatası: {e}")
+        logger.error(f"API anahtarı sınama hatası: {e}")
         return jsonify({"success": False,
-                        "error": "API anahtarı test edilemedi"}),
+                        "error": "API anahtarı sınanamadı"}),
         500
 
 
-# =============== KULLANICI YÖNETİMİ ENDPOINTS (ADMIN) ===============
-
-
+# Kullanıcıları listeleme yönlendirmesi
 @app.route("/api/settings/users", methods=["GET"])
 @login_required
 @role_required("admin")
 def api_admin_get_users():
     """
-    Admin - Tüm kullanıcıları listeler (detaylı)
+    Admin - Tüm kullanıcıları listelerme fonksiyonu
 
     Query Parameters:
     - page (int): Sayfa numarası (varsayılan: 1)
@@ -1412,12 +1345,13 @@ def api_admin_get_users():
         500
 
 
+# Yeni kullanıcı oluşturma yönlendirmesi
 @app.route("/api/settings/users", methods=["POST"])
 @login_required
 @role_required("admin")
 def api_admin_create_user():
     """
-    Admin - Yeni kullanıcı oluştur
+    AYeni kullanıcı oluşturma fonksiyonu
 
     Request Body:
     {
@@ -1461,7 +1395,7 @@ def api_admin_create_user():
                 400,
             )
 
-        # Sadece 'admin' ve 'normal' rolleri veritabanına yazılabilir
+        # Sadece 'admin' ve 'normal' rolleri veri tabanına yazılabilir
         if role not in ["admin", "normal"]:
             role = "normal"
 
@@ -1504,12 +1438,13 @@ def api_admin_create_user():
         500
 
 
+# Kullanıcı bilgilerini güncelleme yönlendirmesi
 @app.route("/api/settings/users/<int:user_id>", methods=["PUT"])
 @login_required
 @role_required("admin")
 def api_admin_update_user(user_id):
     """
-    Admin - Kullanıcı bilgilerini güncelle
+    Kullanıcı bilgilerini güncelleme fonksiyonu
 
     Request Body:
     {
@@ -1657,12 +1592,13 @@ def api_admin_update_user(user_id):
         500
 
 
+# Kullanıcı silme yönlendirmesi
 @app.route("/api/settings/users/<int:user_id>", methods=["DELETE"])
 @login_required
 @role_required("admin")
 def api_admin_delete_user(user_id):
     """
-    Admin - Kullanıcıyı sil
+    Kullanıcıyı silme fonksiyonu
 
     Response:
     {
@@ -1736,12 +1672,13 @@ def api_admin_delete_user(user_id):
         500
 
 
+# Kullancıyı aktif/pasif yapma yönlendirmesi
 @app.route("/api/settings/users/<int:user_id>/activate", methods=["POST"])
 @login_required
 @role_required("admin")
 def api_admin_activate_user(user_id):
     """
-    Admin - Kullanıcıyı aktifleştir/pasifleştir
+    Kullanıcıyı aktif/pasif yapma fonksiyonu
 
     Request Body:
     {
@@ -1821,7 +1758,7 @@ if __name__ == "__main__":
     print(f"- HOST: {config.get('HOST', '0.0.0.0')}")
     print(f"- PORT: {config.get('PORT', 5000)}")
 
-    # Flask development server'ı başlat
+    # Flask sunucusunu başlat
     app.run(
         debug=config.get("DEBUG", False),
         host=config.get("HOST", "0.0.0.0"),

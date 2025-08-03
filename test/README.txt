@@ -1,1 +1,1 @@
-Sınama için dosyalar burada yer alır.
+Sınamaların çıktıları burada yer alır.

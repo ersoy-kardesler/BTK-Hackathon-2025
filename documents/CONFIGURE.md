@@ -1,8 +1,8 @@
-# BTK Hackathon 2025 - Yapılandırma (Config) Rehberi
+# BTK Hackathon 2025 - Yapılandırma Rehberi
 
-Bu doküman, projenin yapılandırma (config) adımlarını ve config.ini dosyasının nasıl hazırlanacağını açıklar.
+Bu doküman, projenin yapılandırma adımlarını ve yapılandırma dosyasının nasıl hazırlanacağını açıklar.
 
-## Konfigürasyon Dosyasını Oluşturma
+## Yapılandırma Dosyasını Oluşturma
 
 1. `config/config.ini.example` dosyasını `config/config.ini` olarak kopyalayın:
    ```bash
@@ -10,7 +10,7 @@ Bu doküman, projenin yapılandırma (config) adımlarını ve config.ini dosyas
    ```
 2. `config/config.ini` dosyasını bir metin düzenleyici ile açın ve aşağıdaki alanları doldurun:
 
-## config.ini Örneği
+## config.ini Dosyasının Örneği
 ```ini
 [flask]
 secret_key = secret-key
@@ -36,7 +36,7 @@ permanent_session_lifetime = 3600
 
 ```
 
-- `DB_PASSWORD`: MariaDB/MySQL root şifrenizi girin.
+- `DB_PASSWORD`: MariaDB/MySQL kullancıı parolasını girin.
 - `SECRET_KEY`: Flask için güçlü bir gizli anahtar oluşturun.
 - Diğer alanları ihtiyaca göre düzenleyebilirsiniz.
 
@@ -44,14 +44,14 @@ permanent_session_lifetime = 3600
 
 - `config/config_loader.py` dosyası, `config.ini` dosyasını okuyarak uygulama ayarlarını yükler.
 - Dosya yoksa veya eksikse, varsayılan ayarlarla çalışır.
-- Sistem ve kullanıcı bazında API anahtarı yönetimi kodda desteklenmektedir. Sistem anahtarı sadece fallback olarak kullanılır.
-- Flask session ayarları ve güvenlik anahtarı kodda detaylandırılmıştır.
+- Sistem ve kullanıcı temelinde API anahtarı yönetimi kodda desteklenmektedir. Sistem anahtarı sadece geri dönüş olarak kullanılır.
+- Flask oturum ayarları ve güvenlik anahtarı kodda detaylandırılmıştır.
 
 ## Sık Karşılaşılan Sorunlar
 
 - `config.ini` eksik veya hatalıysa uygulama başlatılamaz ya da varsayılan ayarlarla çalışır.
 - `DB_PASSWORD` veya `SECRET_KEY` gibi alanlar boş bırakılırsa güvenlik riski oluşur.
 - Ortam değişkenleri eksikse API bağlantıları başarısız olur.
-- Kullanıcı bazında API anahtarı tanımlanmazsa Gemini AI fonksiyonları çalışmaz.
+- Kullanıcı temelinde API anahtarı tanımlanmazsa Gemini ile ilgili fonksiyonlar çalışmaz.
 
 Daha fazla bilgi için `README.md` ve `SETUP.md` dosyalarına bakınız.
