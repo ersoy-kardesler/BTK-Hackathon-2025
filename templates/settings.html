@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kullanıcı Ayarları</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <main>
+        <section class="container-wide">
+            <h1>Kullanıcı Ayarları</h1>
+            <form id="settings-form" autocomplete="off">
+                <label for="gemini_api_key">Gemini API Anahtarı</label>
+                <input type="text" id="gemini_api_key" name="gemini_api_key" placeholder="sk-...">
+                <span id="api-key-info" style="font-size:0.9em;color:#888;"></span>
+                <label for="gemini_model">Gemini Modeli</label>
+                <select id="gemini_model" name="gemini_model">
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                    <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                </select>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">
+                    <input type="checkbox" id="dark_mode" name="dark_mode" style="width:18px;height:18px;margin:0;">
+                    <label for="dark_mode" style="margin:0;color:var(--primary-blue);font-weight:500;cursor:pointer;">Koyu Mod</label>
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:8px;">
+                    <button type="submit" class="btn" style="flex:1;min-width:160px;">Ayarları Kaydet</button>
+                    <button type="button" id="test-api-key" class="btn" style="background:#888;flex:1;min-width:160px;">API Anahtarını Test Et</button>
+                </div>
+            </form>
+            <div id="alert-area"></div>
+            <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
+        </section>
+    </main>
+    <script>
+    async function loadSettings() {
+        try {
+            const response = await fetch('/api/settings');
+            const data = await response.json();
+            if (response.ok && data.success && data.data) {
+                // API anahtarı inputu her zaman boş
+                document.getElementById('gemini_api_key').value = '';
+                document.getElementById('gemini_model').value = data.data.gemini_model || 'gemini-2.5-flash';
+                document.getElementById('dark_mode').checked = !!data.data.dark_mode;
+                // Maskelenmiş anahtarı bilgi olarak göster
+                if (data.data.gemini_api_key_masked) {
+                    document.getElementById('api-key-info').textContent = 'Kayıtlı anahtar: ' + data.data.gemini_api_key_masked;
+                } else {
+                    document.getElementById('api-key-info').textContent = '';
+                }
+            }
+        } catch (err) {}
+    }
+    document.addEventListener('DOMContentLoaded', loadSettings);
+    document.getElementById('settings-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const gemini_api_key = document.getElementById('gemini_api_key').value.trim();
+        const gemini_model = document.getElementById('gemini_model').value;
+        const dark_mode = document.getElementById('dark_mode').checked;
+        const alertArea = document.getElementById('alert-area');
+        alertArea.innerHTML = '<div class="alert">Ayarlar kaydediliyor...</div>';
+        try {
+            const response = await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ gemini_api_key, gemini_model, dark_mode })
+            });
+            const data = await response.json();
+            alertArea.innerHTML = '';
+            if (response.ok && data.success) {
+                alertArea.innerHTML = `<div class='alert success'>${data.message || 'Ayarlar başarıyla kaydedildi.'}</div>`;
+            } else if (data && data.error) {
+                alertArea.innerHTML = `<div class='alert error'>${data.error}</div>`;
+            } else {
+                alertArea.innerHTML = `<div class='alert error'>Sunucudan geçersiz veri alındı!</div>`;
+            }
+        } catch (err) {
+            alertArea.innerHTML = `<div class='alert error'>Sunucuya bağlanılamadı: ${err.message}</div>`;
+        }
+    });
+    document.getElementById('test-api-key').addEventListener('click', async function() {
+        const api_key = document.getElementById('gemini_api_key').value.trim();
+        const alertArea = document.getElementById('alert-area');
+        if (!api_key) {
+            alertArea.innerHTML = '<div class="alert error">API anahtarı giriniz!</div>';
+            return;
+        }
+        alertArea.innerHTML = '<div class="alert">API anahtarı test ediliyor...</div>';
+        try {
+            const response = await fetch('/api/settings/test-api-key', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ api_key })
+            });
+            const data = await response.json();
+            alertArea.innerHTML = '';
+            if (response.ok && data.success) {
+                alertArea.innerHTML = `<div class='alert success'>${data.message || 'API anahtarı geçerli.'}</div>`;
+            } else if (data && data.error) {
+                alertArea.innerHTML = `<div class='alert error'>${data.error}</div>`;
+            } else {
+                alertArea.innerHTML = `<div class='alert error'>Sunucudan geçersiz veri alındı!</div>`;
+            }
+        } catch (err) {
+            alertArea.innerHTML = `<div class='alert error'>Sunucuya bağlanılamadı: ${err.message}</div>`;
+        }
+    });
+    </script>
+</body>
+</html>

@@ -8,7 +8,7 @@ Bu doküman, projeye eklenen veritabanı yapısı hakkında bilgi verir.
 
 1. **users** - Kullanıcı bilgileri
    - id, username, email, password_hash
-   - full_name, role (student/teacher/admin)
+   - full_name, role (student, admin)
    - is_active, created_at, updated_at, last_login
 
 2. **user_sessions** - Oturum yönetimi
@@ -28,6 +28,7 @@ Bu doküman, projeye eklenen veritabanı yapısı hakkında bilgi verir.
 7. **api_keys** - API anahtarları
    - user_id, key_name, api_key_encrypted
    - is_active, created_at, last_used
+   - Not: API anahtarları kullanıcı bazında yönetilir. Sistem anahtarı sadece yedek/fallback olarak kullanılır.
 
 8. **user_settings** - Kullanıcı ayarları
    - user_id, gemini_api_key, gemini_model

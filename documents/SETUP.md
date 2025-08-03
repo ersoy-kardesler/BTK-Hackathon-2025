@@ -111,9 +111,9 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
      DB_CHARSET = utf8mb4
      DB_COLLATION = utf8mb4_unicode_ci
 
-      [app]
-      SECRET_KEY = buraya_güçlü_bir_anahtar_girin
-      DEBUG = True
+     [app]
+     SECRET_KEY = buraya_güçlü_bir_anahtar_girin
+     DEBUG = True
 
    - **Önemli Yapılandırma Notları:**
      - `DB_PASSWORD`: MariaDB root şifrenizi veya oluşturduğunuz kullanıcının şifresini girin

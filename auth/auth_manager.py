@@ -58,7 +58,7 @@ class SessionManager:
             expires_at = datetime.now() + self.session_duration
 
             query = """
-                INSERT INTO user_sessions -
+                INSERT INTO user_sessions
                  (user_id, session_token, expires_at, ip_address, user_agent)
                 VALUES (%s, %s, %s, %s, %s)
             """

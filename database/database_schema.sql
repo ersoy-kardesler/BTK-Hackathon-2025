@@ -154,10 +154,10 @@ CREATE TABLE IF NOT EXISTS system_config (
 
 
 
--- Başlangıç admin ve normal kullanıcıları oluştur (parolalar boş)
+-- Başlangıç admin ve normal kullanıcıları oluştur (bcrypt ile 12345 hash)
 INSERT INTO users (username, email, password_hash, full_name, role) VALUES 
-('admin', 'admin@example.com', '', 'Admin User', 'admin'),
-('user', 'user@example.com', '', 'Normal User', 'normal')
+('admin', 'admin@example.com', '$2b$12$/8h7BqnsU7KWStkQTXAsPeUlFgxVeO8hVZWBd0tGSdOgxFr3j7kxO', 'Admin User', 'admin'),
+('user', 'user@example.com', '$2b$12$/8h7BqnsU7KWStkQTXAsPeUlFgxVeO8hVZWBd0tGSdOgxFr3j7kxO', 'Normal User', 'normal')
 ON DUPLICATE KEY UPDATE id=id;
 
 -- Sistem konfigürasyonu başlangıç verileri
@@ -176,6 +176,7 @@ INSERT INTO system_config (config_key, config_value, config_type, description) V
 ON DUPLICATE KEY UPDATE config_value = VALUES(config_value);
 
 -- Süresi dolmuş sessionları temizlemek için stored procedure
+DROP PROCEDURE IF EXISTS CleanExpiredSessions;
 DELIMITER //
 CREATE PROCEDURE CleanExpiredSessions()
 BEGIN
@@ -191,6 +192,7 @@ DELIMITER ;
 -- DO CALL CleanExpiredSessions();
 
 -- Kullanıcı istatistikleri view'i
+DROP VIEW IF EXISTS user_stats;
 CREATE VIEW user_stats AS
 SELECT 
     u.id,

@@ -38,11 +38,14 @@ PORT = 5000
 
 - `config/config_loader.py` dosyası, `config.ini` dosyasını okuyarak uygulama ayarlarını yükler.
 - Dosya yoksa veya eksikse, varsayılan ayarlarla çalışır.
+- Sistem ve kullanıcı bazında API anahtarı yönetimi kodda desteklenmektedir. Sistem anahtarı sadece fallback olarak kullanılır.
+- Flask session ayarları ve güvenlik anahtarı kodda detaylandırılmıştır.
 
 ## 3. Sık Karşılaşılan Sorunlar
 
 - `config.ini` eksik veya hatalıysa uygulama başlatılamaz ya da varsayılan ayarlarla çalışır.
 - `DB_PASSWORD` veya `SECRET_KEY` gibi alanlar boş bırakılırsa güvenlik riski oluşur.
 - Ortam değişkenleri eksikse API bağlantıları başarısız olur.
+- Kullanıcı bazında API anahtarı tanımlanmazsa Gemini AI fonksiyonları çalışmaz.
 
 Daha fazla bilgi için `README.md` ve `SETUP.md` dosyalarına bakınız.

@@ -213,6 +213,25 @@ class DatabaseConnection:
             logger.error(f"ExecuteMany sorgu hatası: {e}")
             raise
 
+    def fetch_one(self, query: str, params: Optional[Tuple] = None) -> Optional[Dict[str, Any]]:
+        """
+        SELECT sorgusu çalıştırır ve tek satır döndürür
+
+        Args:
+            query (str): SQL sorgusu
+            params (tuple, optional): Sorgu parametreleri
+
+        Returns:
+            Dict[str, Any] | None: Sorgu sonucu veya None
+        """
+        try:
+            with self.get_cursor() as cursor:
+                cursor.execute(query, params or ())
+                return cursor.fetchone()
+        except Error as e:
+            logger.error(f"fetch_one sorgu hatası: {e}")
+            raise
+
 
 # Singleton instance
 db = DatabaseConnection()
@@ -504,13 +523,11 @@ def get_system_config(key: str) -> Optional[str]:
         Optional[str]: Konfigürasyon değeri veya None
     """
     try:
-        result = db.fetch_one(
-            "SELECT config_value FROM"
-            " system_config WHERE config_key = %s", (key,)
+        db_instance = get_db()
+        result = db_instance.execute_single(
+            "SELECT config_value FROM system_config WHERE config_key = %s", (key,)
         )
-
         return result["config_value"] if result else None
-
     except Exception as e:
         logger.error(f"Sistem konfigürasyon alma hatası: {e}")
         return None
@@ -595,27 +612,27 @@ def save_user_settings(
 
             if update_fields:
                 update_fields.append("updated_at = NOW()")
+                query = f"UPDATE user_settings SET {', '.join(update_fields)} WHERE user_id = %s"
                 params.append(user_id)
-
-                query = f"UPDATE user_settings SET"
-                "{', '.join(update_fields)} WHERE user_id = %s"
-                success = db.execute(query, tuple(params))
+                affected = db.execute_update(query, tuple(params))
+                success = affected > 0
             else:
                 # Hiçbir alan güncellenmedi ama başarılı sayalım
                 success = True
         else:
             # Yeni kayıt ekle
-            success = db.execute(
+            query = (
                 "INSERT INTO user_settings (user_id, gemini_api_key, "
-                "gemini_model, dark_mode) VALUES (%s, %s, %s, %s)",
-                (
-                    user_id,
-                    gemini_api_key if gemini_api_key is not None else None,
-                    gemini_model if gemini_model is not None
-                    else "gemini-2.5-flash",
-                    dark_mode if dark_mode is not None else False,
-                ),
+                "gemini_model, dark_mode) VALUES (%s, %s, %s, %s)"
             )
+            params = (
+                user_id,
+                gemini_api_key if gemini_api_key is not None else None,
+                gemini_model if gemini_model is not None else "gemini-2.5-flash",
+                dark_mode if dark_mode is not None else False,
+            )
+            inserted_id = db.execute_insert(query, params)
+            success = inserted_id is not None and inserted_id > 0
 
         return success
 

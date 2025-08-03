@@ -501,29 +501,13 @@ def auth_logout():
 def auth_register():
     """
     Kullanıcı kayıt endpoint'i
-
-    Request Body:
-    {
-        "username": "kullanici_adi",
-        "email": "email@example.com",
-        "password": "sifre",
-        "full_name": "Tam Ad",
-        "role": "student"  // optional: student, teacher, admin
-    }
-
-    Response:
-    {
-        "success": true,
-        "message": "Kayıt başarılı"
-    }
     """
     try:
         # JSON verisini al
         data = request.get_json()
         if not data:
             return jsonify({"success": False,
-                            "error": "JSON verisi bulunamadı"}),
-            400
+                            "error": "JSON verisi bulunamadı"}), 400
 
         username = data.get("username", "").strip()
         email = data.get("email", "").strip()
@@ -543,8 +527,9 @@ def auth_register():
                 400,
             )
 
-        if role not in ["student", "teacher", "admin"]:
-            role = "student"
+        # Sadece 'admin' ve 'normal' rolleri veritabanına yazılabilir
+        if role not in ["admin", "normal"]:
+            role = "normal"
 
         # Kullanıcıyı kaydet
         success, error_message = auth_manager.register_user(
@@ -1189,16 +1174,10 @@ def api_save_settings():
             "gemini-pro-vision",
         ]
         if gemini_model is not None and gemini_model not in valid_models:
-            return (
-                jsonify(
-                    {
-                        "success": False,
-                        "error": f"Geçersiz model. "
-                        "Geçerli modeller: {', '.join(valid_models)}",
-                    }
-                ),
-                400,
-            )
+            return jsonify({
+                "success": False,
+                "error": f"Geçersiz model. Geçerli modeller: {', '.join(valid_models)}"
+            }), 400
 
         # Ayarları kaydet
         success = save_user_settings(
@@ -1210,8 +1189,7 @@ def api_save_settings():
 
         if not success:
             return jsonify({"success": False,
-                            "error": "Ayarlar kaydedilemedi"}),
-            500
+                            "error": "Ayarlar kaydedilemedi"}), 500
 
         return jsonify({"success": True,
                         "message": "Ayarlar başarıyla kaydedildi"})
@@ -1305,7 +1283,7 @@ def api_admin_get_users():
     - page (int): Sayfa numarası (varsayılan: 1)
     - limit (int): Sayfa başına kayıt (varsayılan: 20, max: 100)
     - search (str): Arama terimi (username, email, full_name)
-    - role (str): Rol filtresi (student, teacher, admin)
+    - role (str): Rol filtresi (student, admin)
     - is_active (bool): Aktiflik filtresi
 
     Response:
@@ -1345,7 +1323,7 @@ def api_admin_get_users():
             params.extend([search_term, search_term, search_term])
 
         # Rol filtresi
-        if role_filter in ["student", "teacher", "admin"]:
+        if role_filter in ["student", "admin"]:
             where_conditions.append("u.role = %s")
             params.append(role_filter)
 
@@ -1424,7 +1402,7 @@ def api_admin_create_user():
         "email": "email@example.com",
         "password": "sifre",
         "full_name": "Tam Ad",
-        "role": "student"  // student, teacher, admin
+        "role": "student"  // student, admin
     }
 
     Response:
@@ -1440,8 +1418,7 @@ def api_admin_create_user():
         data = request.get_json()
         if not data:
             return jsonify({"success": False,
-                            "error": "JSON verisi bulunamadı"}),
-            400
+                            "error": "JSON verisi bulunamadı"}), 400
 
         username = data.get("username", "").strip()
         email = data.get("email", "").strip()
@@ -1461,12 +1438,9 @@ def api_admin_create_user():
                 400,
             )
 
-        if role not in ["student", "teacher", "admin"]:
-            return (
-                jsonify({"success": False,
-                         "error": "Geçersiz rol değeri"}),
-                400,
-            )
+        # Sadece 'admin' ve 'normal' rolleri veritabanına yazılabilir
+        if role not in ["admin", "normal"]:
+            role = "normal"
 
         # Email formatı kontrolü
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
@@ -1492,7 +1466,7 @@ def api_admin_create_user():
         user_id = user_result["id"] if user_result else None
 
         logger.info(f"Admin {g.current_user['username']}"
-                    " tarafından yeni kullanıcı oluşturuldu: {username}")
+                    f" tarafından yeni kullanıcı oluşturuldu: {username}")
 
         return jsonify({
             "success": True,
@@ -1519,7 +1493,7 @@ def api_admin_update_user(user_id):
         "username": "yeni_kullanici_adi",  // isteğe bağlı
         "email": "yeni_email@example.com",  // isteğe bağlı
         "full_name": "Yeni Tam Ad",  // isteğe bağlı
-        "role": "teacher",  // isteğe bağlı
+        "role": "student",  // isteğe bağlı
         "is_active": true,  // isteğe bağlı
         "password": "yeni_sifre"  // isteğe bağlı
     }
@@ -1602,7 +1576,7 @@ def api_admin_update_user(user_id):
         # Role
         if "role" in data:
             role = data["role"].strip()
-            if role not in ["student", "teacher", "admin"]:
+            if role not in ["student", "admin"]:
                 return jsonify({"success": False,
                                 "error": "Geçersiz rol değeri"}),
                 400

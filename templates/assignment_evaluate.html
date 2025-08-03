@@ -34,7 +34,6 @@
             alertArea.innerHTML = '<div class="alert error">Tüm alanları doldurunuz!</div>';
             return;
         }
-        // Yükleme mesajını göster
         alertArea.innerHTML = '<div class="alert">Ödev değerlendiriliyor... Bu, birkaç dakika sürebilir. Lütfen bekleyiniz.</div>';
         try {
             const response = await fetch('/api/assignment_evaluate', {
@@ -44,8 +43,7 @@
             });
             const data = await response.json();
             alertArea.innerHTML = '';
-            if (response.ok && data.success && data.education) {
-                // Yapay zeka çıktısını düz metin olarak göster
+            if (response.ok && data.success && data.evaluation) {
                 resultDiv.innerHTML = `<div class='alert success'>Değerlendirme Sonucu:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${data.evaluation.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
             } else if (data && data.error) {
                 alertArea.innerHTML = `<div class='alert error'>Veri alındı ama hata oluştu: ${data.error}</div>`;

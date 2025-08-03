@@ -132,7 +132,7 @@ def role_required(*allowed_roles):
     Usage:
         @app.route('/admin')
         @login_required
-        @role_required('admin', 'teacher')
+        @role_required('admin', 'student')
         def admin_route():
             return "Admin sayfası"
     """

@@ -10,9 +10,18 @@
     <div class="container">
         <h1>Eğitim Yönetim Sistemi</h1>
         <p>Yapay zeka destekli içerik üretimi ve değerlendirme aracı</p>
-        <div class="button-group">
-            <a href="{{ url_for('education') }}" class="btn">Eğitim Oluştur</a>
-            <a href="{{ url_for('assignment_evaluate') }}" class="btn">Ödev Değerlendir</a>
+        <div class="button-group" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:12px;">
+            <a href="{{ url_for('education') }}" class="btn" style="flex:1;min-width:160px;">Eğitim Oluştur</a>
+            <a href="{{ url_for('assignment_evaluate') }}" class="btn" style="flex:1;min-width:160px;">Ödev Değerlendir</a>
+            <a href="{{ url_for('settings_page') }}" class="btn" style="flex:1;min-width:160px;">Ayarlar</a>
+            {% if current_user %}
+                <form action="{{ url_for('auth_logout') }}" method="post" style="display:inline;flex:1;min-width:160px;">
+                    <button type="submit" class="btn" style="width:100%;">Oturumu Kapat</button>
+                </form>
+            {% else %}
+                <a href="{{ url_for('login_page') }}" class="btn" style="flex:1;min-width:160px;">Giriş Yap</a>
+            {% endif %}
+            <a href="{{ url_for('register_page') }}" class="btn" style="flex:1;min-width:160px;">Kayıt Ol</a>
         </div>
         <div class="about-section">
             <b>BTK Hackathon 2025</b> &ndash; Ersoy Kardeşler

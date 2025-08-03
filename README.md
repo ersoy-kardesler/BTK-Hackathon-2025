@@ -6,6 +6,14 @@ Yapay zeka destekli eğitim yönetim sistemi.
 
 Bu proje, Google Gemini AI ile eğitim içerikleri oluşturabilen bir Flask web uygulamasıdır.
 
+## Özellikler
+- Eğitim içeriği oluşturma (Google Gemini AI ile)
+- Ödev değerlendirme
+- Kullanıcı kimlik doğrulama ve oturum yönetimi (MariaDB)
+- Kullanıcı bazında API anahtarı yönetimi
+- Kullanıcı ayarları ve favori içerik yönetimi
+- Admin paneli ve kullanıcı yönetimi
+
 ## Belgeler
 
 - **Kurulum ve gereksinimler için:** [documents/SETUP.md](documents/SETUP.md)

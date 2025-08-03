@@ -22,19 +22,17 @@
         </section>
     </main>
     <script>
-    document.getElementById('generate-btn').addEventListener('click', async function(e) {
+    document.getElementById('education-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const subject = document.getElementById('subject').value.trim();
         const alertArea = document.getElementById('alert-area');
         const resultDiv = document.getElementById('education-result');
         alertArea.innerHTML = '';
         resultDiv.innerHTML = '';
-        // Hata mesajını göster
         if (!subject) {
             alertArea.innerHTML = '<div class="alert error">Ders adı boş olamaz!</div>';
             return;
         }
-        // Yükleme mesajını göster
         alertArea.innerHTML = '<div class="alert">Eğitim oluşturuluyor... Bu, birkaç dakika sürebilir. Lütfen bekleyiniz.</div>';
         try {
             const response = await fetch('/api/education', {
@@ -46,7 +44,6 @@
             alertArea.innerHTML = '';
             if (response.ok && data.success && data.education) {
                 const education = data.education;
-                // Yapay zeka çıktısını düz metin olarak göster
                 resultDiv.innerHTML = `<div class='alert success'><b>${data.subject}</b> için oluşturulan eğitim:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${education.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
             } else if (data && data.error) {
                 alertArea.innerHTML = `<div class='alert error'>Veri alındı ama hata oluştu: ${data.error}</div>`;

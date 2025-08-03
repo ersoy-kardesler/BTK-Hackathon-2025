@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <main>
+        <section class="container-wide">
+            <h1>Giriş Yap</h1>
+            <form id="login-form" autocomplete="off">
+                <input type="text" id="username" name="username" placeholder="Kullanıcı Adı" required>
+                <input type="password" id="password" name="password" placeholder="Şifre" required>
+                <button type="submit" class="btn">Giriş Yap</button>
+            </form>
+            <div id="alert-area"></div>
+            <a href="{{ url_for('register_page') }}" class="btn" style="margin-top:24px;background:#888;">Kayıt Ol</a>
+            <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
+        </section>
+    </main>
+    <script>
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const alertArea = document.getElementById('alert-area');
+        alertArea.innerHTML = '';
+        if (!username || !password) {
+            alertArea.innerHTML = '<div class="alert error">Tüm alanları doldurunuz!</div>';
+            return;
+        }
+        alertArea.innerHTML = '<div class="alert">Giriş yapılıyor...</div>';
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await response.json();
+            alertArea.innerHTML = '';
+            if (response.ok && data.success) {
+                window.location.href = '/';
+            } else if (data && data.error) {
+                alertArea.innerHTML = `<div class='alert error'>${data.error}</div>`;
+            } else {
+                alertArea.innerHTML = `<div class='alert error'>Sunucudan geçersiz veri alındı!</div>`;
+            }
+        } catch (err) {
+            alertArea.innerHTML = `<div class='alert error'>Sunucuya bağlanılamadı: ${err.message}</div>`;
+        }
+    });
+    </script>
+</body>
+</html>
