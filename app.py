@@ -1291,6 +1291,516 @@ def api_test_gemini_key():
         500
 
 
+# =============== KULLANICI YÖNETİMİ ENDPOINTS (ADMIN) ===============
+
+
+@app.route("/api/settings/users", methods=["GET"])
+@login_required
+@role_required("admin")
+def api_admin_get_users():
+    """
+    Admin - Tüm kullanıcıları listeler (detaylı)
+
+    Query Parameters:
+    - page (int): Sayfa numarası (varsayılan: 1)
+    - limit (int): Sayfa başına kayıt (varsayılan: 20, max: 100)
+    - search (str): Arama terimi (username, email, full_name)
+    - role (str): Rol filtresi (student, teacher, admin)
+    - is_active (bool): Aktiflik filtresi
+
+    Response:
+    {
+        "success": true,
+        "data": {
+            "users": [...],
+            "total": 50,
+            "page": 1,
+            "limit": 20,
+            "pages": 3
+        }
+    }
+    """
+    try:
+        # Parametreleri al
+        page = int(request.args.get("page", 1))
+        limit = min(int(request.args.get("limit", 20)), 100)
+        search = request.args.get("search", "").strip()
+        role_filter = request.args.get("role", "").strip()
+        is_active_filter = request.args.get("is_active")
+        offset = (page - 1) * limit
+
+        db = get_db()
+
+        # WHERE koşullarını oluştur
+        where_conditions = ["u.id IS NOT NULL"]
+        params = []
+
+        # Arama filtresi
+        if search:
+            where_conditions.append(
+                "(u.username LIKE %s OR u.email LIKE"
+                " %s OR u.full_name LIKE %s)"
+            )
+            search_term = f"%{search}%"
+            params.extend([search_term, search_term, search_term])
+
+        # Rol filtresi
+        if role_filter in ["student", "teacher", "admin"]:
+            where_conditions.append("u.role = %s")
+            params.append(role_filter)
+
+        # Aktiflik filtresi
+        if is_active_filter is not None:
+            is_active = is_active_filter.lower() in ["true", "1", "yes"]
+            where_conditions.append("u.is_active = %s")
+            params.append(is_active)
+
+        where_clause = " AND ".join(where_conditions)
+
+        # Toplam kayıt sayısı
+        count_query = f"SELECT COUNT(*) as total FROM users u "
+        "WHERE {where_clause}"
+        total_result = db.execute_single(count_query, tuple(params))
+        total = total_result["total"] if total_result else 0
+
+        # Kullanıcı listesi
+        query = f"""
+            SELECT
+                u.id, u.username, u.email, u.full_name, u.role,
+                u.is_active, u.created_at, u.last_login,
+                COUNT(DISTINCT ec.id) as education_count,
+                COUNT(DISTINCT ae.id) as assignment_count,
+                us.gemini_model, us.dark_mode,
+                CASE WHEN us.gemini_api_key IS NOT NULL
+                    AND us.gemini_api_key != ''
+                    THEN TRUE ELSE FALSE END as has_api_key
+            FROM users u
+            LEFT JOIN education_contents ec ON u.id = ec.user_id
+            LEFT JOIN assignment_evaluations ae ON u.id = ae.user_id
+            LEFT JOIN user_settings us ON u.id = us.user_id
+            WHERE {where_clause}
+            GROUP BY u.id, u.username, u.email, u.full_name, u.role,
+                    u.is_active, u.created_at, u.last_login,
+                    us.gemini_model, us.dark_mode, us.gemini_api_key
+            ORDER BY u.created_at DESC
+            LIMIT %s OFFSET %s
+        """
+
+        params.extend([limit, offset])
+        users = db.execute_query(query, tuple(params))
+
+        pages = (total + limit - 1) // limit if total > 0 else 0
+
+        return jsonify(
+            {
+                "success": True,
+                "data": {
+                    "users": users,
+                    "total": total,
+                    "page": page,
+                    "limit": limit,
+                    "pages": pages,
+                },
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Admin kullanıcı listesi hatası: {e}")
+        return jsonify({"success": False,
+                        "error": "Kullanıcı listesi alınamadı"}),
+        500
+
+
+@app.route("/api/settings/users", methods=["POST"])
+@login_required
+@role_required("admin")
+def api_admin_create_user():
+    """
+    Admin - Yeni kullanıcı oluştur
+
+    Request Body:
+    {
+        "username": "kullanici_adi",
+        "email": "email@example.com",
+        "password": "sifre",
+        "full_name": "Tam Ad",
+        "role": "student"  // student, teacher, admin
+    }
+
+    Response:
+    {
+        "success": true,
+        "message": "Kullanıcı başarıyla oluşturuldu",
+        "data": {
+            "user_id": 123
+        }
+    }
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"success": False,
+                            "error": "JSON verisi bulunamadı"}),
+            400
+
+        username = data.get("username", "").strip()
+        email = data.get("email", "").strip()
+        password = data.get("password", "")
+        full_name = data.get("full_name", "").strip()
+        role = data.get("role", "student").strip()
+
+        # Validasyon
+        if not username or not email or not password:
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "error": "Kullanıcı adı, e-posta ve şifre gerekli",
+                    }
+                ),
+                400,
+            )
+
+        if role not in ["student", "teacher", "admin"]:
+            return (
+                jsonify({"success": False,
+                         "error": "Geçersiz rol değeri"}),
+                400,
+            )
+
+        # Email formatı kontrolü
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, email):
+            return (
+                jsonify({"success": False,
+                         "error": "Geçersiz email formatı"}),
+                400,
+            )
+
+        # Kullanıcıyı oluştur
+        success, error_message = auth_manager.register_user(
+            username, email, password, full_name, role
+        )
+
+        if not success:
+            return jsonify({"success": False, "error": error_message}), 400
+
+        # Oluşturulan kullanıcının ID'sini al
+        db = get_db()
+        user_query = "SELECT id FROM users WHERE username = %s"
+        user_result = db.execute_single(user_query, (username,))
+        user_id = user_result["id"] if user_result else None
+
+        logger.info(f"Admin {g.current_user['username']}"
+                    " tarafından yeni kullanıcı oluşturuldu: {username}")
+
+        return jsonify({
+            "success": True,
+            "message": "Kullanıcı başarıyla oluşturuldu",
+            "data": {"user_id": user_id}
+        })
+
+    except Exception as e:
+        logger.error(f"Admin kullanıcı oluşturma hatası: {e}")
+        return jsonify({"success": False,
+                        "error": "Kullanıcı oluşturulamadı"}),
+        500
+
+
+@app.route("/api/settings/users/<int:user_id>", methods=["PUT"])
+@login_required
+@role_required("admin")
+def api_admin_update_user(user_id):
+    """
+    Admin - Kullanıcı bilgilerini güncelle
+
+    Request Body:
+    {
+        "username": "yeni_kullanici_adi",  // isteğe bağlı
+        "email": "yeni_email@example.com",  // isteğe bağlı
+        "full_name": "Yeni Tam Ad",  // isteğe bağlı
+        "role": "teacher",  // isteğe bağlı
+        "is_active": true,  // isteğe bağlı
+        "password": "yeni_sifre"  // isteğe bağlı
+    }
+
+    Response:
+    {
+        "success": true,
+        "message": "Kullanıcı başarıyla güncellendi"
+    }
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"success": False,
+                            "error": "JSON verisi bulunamadı"}),
+            400
+
+        db = get_db()
+
+        # Kullanıcının var olduğunu kontrol et
+        check_query = "SELECT id, username FROM users WHERE id = %s"
+        existing_user = db.execute_single(check_query, (user_id,))
+        if not existing_user:
+            return jsonify({"success": False,
+                            "error": "Kullanıcı bulunamadı"}),
+            404
+
+        # Güncellenecek alanları topla
+        update_fields = []
+        update_params = []
+
+        # Username
+        if "username" in data:
+            username = data["username"].strip()
+            if username:
+                # Username benzersizlik kontrolü
+                username_check = db.execute_single(
+                    "SELECT id FROM users WHERE username = %s AND id != %s",
+                    (username, user_id)
+                )
+                if username_check:
+                    return jsonify({"success": False,
+                                    "error": "Bu kullanıcı"
+                                    " adı zaten kullanılıyor"}),
+                    400
+                update_fields.append("username = %s")
+                update_params.append(username)
+
+        # Email
+        if "email" in data:
+            email = data["email"].strip()
+            if email:
+                # Email formatı kontrolü
+                email_pattern = (
+                    r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                )
+                if not re.match(email_pattern, email):
+                    return jsonify({"success": False,
+                                    "error": "Geçersiz email formatı"}),
+                    400
+                # Email benzersizlik kontrolü
+                email_check = db.execute_single(
+                    "SELECT id FROM users WHERE email = %s AND id != %s",
+                    (email, user_id)
+                )
+                if email_check:
+                    return jsonify({"success": False,
+                                    "error": "Bu e-posta adresi"
+                                    " zaten kullanılıyor"}),
+                    400
+                update_fields.append("email = %s")
+                update_params.append(email)
+
+        # Full name
+        if "full_name" in data:
+            full_name = data["full_name"].strip()
+            update_fields.append("full_name = %s")
+            update_params.append(full_name)
+
+        # Role
+        if "role" in data:
+            role = data["role"].strip()
+            if role not in ["student", "teacher", "admin"]:
+                return jsonify({"success": False,
+                                "error": "Geçersiz rol değeri"}),
+                400
+            update_fields.append("role = %s")
+            update_params.append(role)
+
+        # Is active
+        if "is_active" in data:
+            is_active = bool(data["is_active"])
+            update_fields.append("is_active = %s")
+            update_params.append(is_active)
+
+        # Password
+        if "password" in data:
+            password = data["password"]
+            if password:
+                # Şifreyi hash'le
+                import bcrypt
+                hashed_password = bcrypt.hashpw(password.encode('utf-8'),
+                                                bcrypt.gensalt())
+                update_fields.append("password_hash = %s")
+                update_params.append(hashed_password.decode('utf-8'))
+
+        if not update_fields:
+            return jsonify({"success": False,
+                            "error": "Güncellenecek alan bulunamadı"}),
+            400
+
+        # Güncelleme tarihini ekle
+        update_fields.append("updated_at = CURRENT_TIMESTAMP")
+
+        # Update query'yi çalıştır
+        update_query = f"""
+            UPDATE users
+             SET {', '.join(update_fields)}
+             WHERE id = %s
+        """
+        update_params.append(user_id)
+
+        db.execute_update(update_query, tuple(update_params))
+
+        logger.info(f"Admin {g.current_user['username']}"
+                    " tarafından kullanıcı güncellendi:"
+                    " {existing_user['username']} (ID: {user_id})")
+
+        return jsonify({
+            "success": True,
+            "message": "Kullanıcı başarıyla güncellendi"
+        })
+
+    except Exception as e:
+        logger.error(f"Admin kullanıcı güncelleme hatası: {e}")
+        return jsonify({"success": False,
+                        "error": "Kullanıcı güncellenemedi"}),
+        500
+
+
+@app.route("/api/settings/users/<int:user_id>", methods=["DELETE"])
+@login_required
+@role_required("admin")
+def api_admin_delete_user(user_id):
+    """
+    Admin - Kullanıcıyı sil
+
+    Response:
+    {
+        "success": true,
+        "message": "Kullanıcı başarıyla silindi"
+    }
+    """
+    try:
+        # Kendi hesabını silemez
+        if user_id == g.current_user["user_id"]:
+            return jsonify({"success": False,
+                            "error": "Kendi hesabınızı silemezsiniz"}),
+            400
+
+        db = get_db()
+
+        # Kullanıcının var olduğunu kontrol et
+        check_query = "SELECT id, username FROM users WHERE id = %s"
+        existing_user = db.execute_single(check_query, (user_id,))
+        if not existing_user:
+            return jsonify({"success": False,
+                            "error": "Kullanıcı bulunamadı"}),
+            404
+
+        # İlişkili verileri sil (foreign key constraints nedeniyle)
+        try:
+            # User settings
+            db.execute_delete("DELETE FROM user_settings WHERE "
+                              "user_id = %s",
+                              (user_id,))
+
+            # User sessions
+            db.execute_delete("DELETE FROM user_sessions WHERE "
+                              "user_id = %s",
+                              (user_id,))
+
+            # Assignment evaluations
+            db.execute_delete("DELETE FROM assignment_evaluations"
+                              " WHERE user_id = %s",
+                              (user_id,))
+
+            # Education contents
+            db.execute_delete("DELETE FROM education_contents WHERE "
+                              "user_id = %s",
+                              (user_id,))
+
+            # Son olarak kullanıcıyı sil
+            db.execute_delete("DELETE FROM users WHERE id = %s",
+                              (user_id,))
+
+        except Exception as delete_error:
+            logger.error(f"Kullanıcı silme işlemi sırasında hata:"
+                         " {delete_error}")
+            return jsonify({"success": False,
+                            "error": "Kullanıcı silinirken hata oluştu"}),
+            500
+
+        logger.info(f"Admin {g.current_user['username']} tarafından"
+                    " kullanıcı silindi: {existing_user['username']}"
+                    " (ID: {user_id})")
+
+        return jsonify({
+            "success": True,
+            "message": "Kullanıcı başarıyla silindi"
+        })
+
+    except Exception as e:
+        logger.error(f"Admin kullanıcı silme hatası: {e}")
+        return jsonify({"success": False,
+                        "error": "Kullanıcı silinemedi"}),
+        500
+
+
+@app.route("/api/settings/users/<int:user_id>/activate", methods=["POST"])
+@login_required
+@role_required("admin")
+def api_admin_activate_user(user_id):
+    """
+    Admin - Kullanıcıyı aktifleştir/pasifleştir
+
+    Request Body:
+    {
+        "is_active": true
+    }
+
+    Response:
+    {
+        "success": true,
+        "message": "Kullanıcı durumu güncellendi"
+    }
+    """
+    try:
+        data = request.get_json()
+        if not data or "is_active" not in data:
+            return jsonify({"success": False,
+                            "error": "is_active parametresi gerekli"}),
+            400
+
+        is_active = bool(data["is_active"])
+
+        db = get_db()
+
+        # Kullanıcının var olduğunu kontrol et
+        check_query = "SELECT id, username, is_active FROM users WHERE id = %s"
+        existing_user = db.execute_single(check_query, (user_id,))
+        if not existing_user:
+            return jsonify({"success": False,
+                            "error": "Kullanıcı bulunamadı"}),
+            404
+
+        # Durumu güncelle
+        update_query = """
+            UPDATE users
+             SET is_active = %s, updated_at = CURRENT_TIMESTAMP
+             WHERE id = %s
+        """
+        db.execute_update(update_query, (is_active, user_id))
+
+        status_text = "aktifleştirildi" if is_active else "pasifleştirildi"
+        logger.info(f"Admin {g.current_user['username']} tarafından"
+                    " kullanıcı {status_text}: {existing_user['username']}"
+                    " (ID: {user_id})")
+
+        return jsonify({
+            "success": True,
+            "message": f"Kullanıcı başarıyla {status_text}"
+        })
+
+    except Exception as e:
+        logger.error(f"Admin kullanıcı durum güncelleme hatası: {e}")
+        return jsonify({"success": False,
+                        "error": "Kullanıcı durumu güncellenemedi"}),
+        500
+
+
 # Uygulamayı çalıştır
 if __name__ == "__main__":
     """
