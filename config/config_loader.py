@@ -22,7 +22,7 @@ def load_config(config_file: str = "config/config.ini") -> Dict[str, Any]:
     Yapılandırma dosyasından yapılandırmaları yükleme fonksiyonu
 
     Parametreler:
-        config_file (str): Yapılandırmadosyasının yolu
+        config_file (str): Yapılandırma dosyasının yolu
 
     Döndürülenler:
         Dict[str, Any]: Yapılandırmaları

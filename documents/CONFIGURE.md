@@ -1,6 +1,6 @@
 # BTK Hackathon 2025 - Yapılandırma Rehberi
 
-Bu doküman, projenin yapılandırma adımlarını ve yapılandırma dosyasının nasıl hazırlanacağını açıklar.
+Bu belge, projenin yapılandırma adımlarını ve yapılandırma dosyasının nasıl hazırlanacağını açıklar.
 
 ## Yapılandırma Dosyasını Oluşturma
 
@@ -36,7 +36,7 @@ permanent_session_lifetime = 3600
 
 ```
 
-- `DB_PASSWORD`: MariaDB/MySQL kullancıı parolasını girin.
+- `DB_PASSWORD`: MariaDB/MySQL kullancı parolasını girin.
 - `SECRET_KEY`: Flask için güçlü bir gizli anahtar oluşturun.
 - Diğer alanları ihtiyaca göre düzenleyebilirsiniz.
 
@@ -44,7 +44,7 @@ permanent_session_lifetime = 3600
 
 - `config/config_loader.py` dosyası, `config.ini` dosyasını okuyarak uygulama ayarlarını yükler.
 - Dosya yoksa veya eksikse, varsayılan ayarlarla çalışır.
-- Sistem ve kullanıcı temelinde API anahtarı yönetimi kodda desteklenmektedir. Sistem anahtarı sadece geri dönüş olarak kullanılır.
+- Sistem ve kullanıcı temelinde API anahtarı yönetimi kodda desteklenmektedir. Sistem anahtarı sadece yedek anahtar olarak kullanılır.
 - Flask oturum ayarları ve güvenlik anahtarı kodda detaylandırılmıştır.
 
 ## Sık Karşılaşılan Sorunlar

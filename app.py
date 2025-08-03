@@ -44,7 +44,7 @@ from database.database_connection import (
 from education.generate_education import generate_education
 from education.evaluate_assignment import evaluate_assignment
 
-# KYapılandırma ayarlarını yükle
+# Yapılandırma ayarlarını yükle
 config = load_config()
 
 
@@ -143,7 +143,7 @@ print("Google Gemini API modülü yüklendi!")
 print("API anahtarları kullanıcı temelinde yönetilecek.")
 
 
-# Ana sayfa yönelndirmesi
+# Ana sayfa yönlendirmesi
 @app.route("/")
 @optional_auth
 def index():
@@ -178,7 +178,7 @@ def education():
     return render_template("education.html", current_user=g.current_user)
 
 
-# Ödev değerlendirme sayfası yönelndirmesi
+# Ödev değerlendirme sayfası yönlendirmesi
 @app.route("/assignment_evaluate", methods=["GET"])
 @login_required
 def assignment_evaluate():
@@ -190,7 +190,7 @@ def assignment_evaluate():
                            current_user=g.current_user)
 
 
-# Eğitim oluşturma yönelndirmesi
+# Eğitim oluşturma yönlendirmesi
 @app.route("/api/education", methods=["POST"])
 @login_required
 def api_education():
@@ -260,7 +260,7 @@ def api_education():
         )
 
 
-# Ödev değerlendirme yönelndirmesi
+# Ödev değerlendirme yönlendirmesi
 @app.route("/api/assignment_evaluate", methods=["POST"])
 @login_required
 def api_assignment_evaluate():
@@ -353,7 +353,7 @@ def api_assignment_evaluate():
         )
 
 
-# Kullanıcı girişi sayfası yönelndirmesi
+# Kullanıcı girişi sayfası yönlendirmesi
 @app.route("/login", methods=["GET"])
 def login_page():
     """
@@ -362,7 +362,7 @@ def login_page():
     return render_template("login.html")
 
 
-# Kullanıcı kaydı sayfası yönelndirmesi
+# Kullanıcı kaydı sayfası yönlendirmesi
 @app.route("/register", methods=["GET"])
 @login_required
 @role_required("admin")
@@ -373,7 +373,7 @@ def register_page():
     return render_template("register.html")
 
 
-# Kullanıcı çıkışı sayfası yönelndirmesi
+# Kullanıcı çıkışı sayfası yönlendirmesi
 @app.route("/logout", methods=["GET"])
 def logout_page():
     """
@@ -927,7 +927,7 @@ def user_dashboard_stats():
         500
 
 
-# Tüm kullanıcıları listeleme yönelndirmesi
+# Tüm kullanıcıları listeleme yönlendirmesi
 @app.route("/api/user/admin/users", methods=["GET"])
 @login_required
 @role_required("admin")
@@ -1030,7 +1030,7 @@ def settings_page():
     return render_template("settings.html", current_user=g.current_user)
 
 
-# Ayarlar yönelndirmesi
+# Ayarlar yönlendirmesi
 @app.route("/api/settings", methods=["GET"])
 @login_required
 def api_get_settings():
@@ -1076,7 +1076,7 @@ def api_get_settings():
         return jsonify({"success": False, "error": "Ayarlar alınamadı"}), 500
 
 
-# Kullanıcı ayarları yönelndirmesi
+# Kullanıcı ayarları yönlendirmesi
 @app.route("/api/settings", methods=["POST"])
 @login_required
 def api_save_settings():

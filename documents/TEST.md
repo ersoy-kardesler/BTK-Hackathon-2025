@@ -4,7 +4,7 @@ Bu belge, BTK Hackathon 2025 projesinin sınama süreçleri hakkında bilgi verm
 
 ## Sınamaların Amacı
 
-Bu projede tsınamalar, geliştirilen modüllerin doğru çalıştığını ve beklenen sonuçları verdiğini doğrulamak amacıyla hazırlanmıştır.
+Bu projede sınamalar, geliştirilen modüllerin doğru çalıştığını ve beklenen sonuçları verdiğini doğrulamak amacıyla hazırlanmıştır.
 
 ## Sınama Kapsamı
 

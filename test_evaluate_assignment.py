@@ -154,7 +154,7 @@ if __name__ == "__main__":
     except Exception as e:
         # Hata iletisini yaz
         print(f"\n\nKritik hata oluştu: {str(e)}")
-        print("Lütfen .env dosyasını ve API ayarlarını kontrol edin.")
+        print("Lütfen config.ini dosyasını ve API ayarlarını kontrol edin.")
     finally:
         # Son iletiyi yaz
         print("\n" + "=" * 60)

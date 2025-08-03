@@ -277,7 +277,7 @@ def init_database():
         return False
 
 
-# VVeri tabanı örneğini döndürme fonksiyonu
+# Veri tabanı örneğini döndürme fonksiyonu
 def get_db():
     """
     Veri tabanı örneğini döndürme fonksiyonu
@@ -469,10 +469,10 @@ def get_api_key(
         return False
 
 
-# Başlangıç veri tabanı MariaDB'ye uygulama fonksiyonu
+# Başlangıç veri tabanı şemasını MariaDB'ye uygulama fonksiyonu
 def initialize_database_schema():
     """
-    Başlangıç veri tabanı MariaDB'ye uygulama fonksiyonu
+    Başlangıç veri tabanı şemasını MariaDB'ye uygulama fonksiyonu
 
     Kurulum sırasında çağrıldığında Veri tabanı ve
      tüm tablolar otomatik olarak oluşturulur.

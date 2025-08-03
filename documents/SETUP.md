@@ -1,6 +1,6 @@
 # BTK Hackathon 2025 - Kurulum Rehberi
 
-Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
+Bu belge, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
 
 ## Gereksinimler
 
@@ -121,7 +121,7 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
 
 # Kurulumun Doğrulanması
 
-Kurulumdan sonra aşağıdaki adımları izleyerek uygulamanın doğru çalıştığını sınayabilrisiniz:
+Kurulumdan sonra aşağıdaki adımları izleyerek uygulamanın doğru çalıştığını sınayabilirisiniz:
 
 1. Web tarayıcınızda `http://127.0.0.1:5000` adresine gidin ve ana sayfanın açıldığını doğrulayın.
 2. Hatalarla karşılaşırsanız terminaldeki hata iletilerini inceleyin.

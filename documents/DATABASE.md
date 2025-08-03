@@ -1,6 +1,6 @@
 # BTK Hackathon 2025 - MariaDB ve Kimlik Doğrulama Entegrasyonu
 
-Bu doküman, projeye eklenen veri tabanı yapısı hakkında bilgi verir.
+Bu belge, projeye eklenen veri tabanı yapısı hakkında bilgi verir.
 
 ## Veri Tabanı Yapısı
 
@@ -32,7 +32,7 @@ Bu doküman, projeye eklenen veri tabanı yapısı hakkında bilgi verir.
 7. **api_keys** - API anahtarları
    - id, user_id, key_name, api_key_encrypted
    - is_active, created_at, updated_at, last_used, usage_count
-   - Not: API anahtarları kullanıcı bazında yönetilir. Sistem anahtarı sadece yedek/fallback olarak kullanılır.
+   - Not: API anahtarları kullanıcı bazında yönetilir. Sistem anahtarı sadece yedek anahtar olarak kullanılır.
 
 8. **user_settings** - Kullanıcı ayarları
    - user_id, gemini_api_key, gemini_model

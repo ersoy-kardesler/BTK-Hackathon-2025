@@ -182,10 +182,10 @@ def role_required(*allowed_roles):
     return decorator
 
 
-# İsteğe bağlı kimlik doğrulama detimi fonksiyonu
+# İsteğe bağlı kimlik doğrulama denetimi fonksiyonu
 def optional_auth(f):
     """
-    İsteğe bağlı kimlik doğrulama detimi fonksiyonu
+    İsteğe bağlı kimlik doğrulama denetimi fonksiyonu
 
     Giriş yapmış kullanıcı varsa g.current_user'a ekler,
     yoksa None olarak bırakır
@@ -221,7 +221,7 @@ def api_key_required(f):
     """
     API anahtarı gerektiren uç noktalar için denetim fonksiyonu
 
-    Hem oturum işlaretçisi hem de API anahtarı denetimi yapar
+    Hem oturum işaretçisi hem de API anahtarı denetimi yapar
 
     Kullanım:
         @app.route('/api/data')
@@ -363,10 +363,10 @@ def has_any_role(required_roles: List[str]) -> bool:
     return user.get("role") in required_roles
 
 
-# Yetkisiz yanıtı döndürürme fonksiyonu
+# Yetkisiz yanıtı döndürme fonksiyonu
 def unauthorized_response(message: str = "Giriş yapmanız gerekiyor"):
     """
-    Yetkisiz yanıtı döndürürme fonksiyonu
+    Yetkisiz yanıtı döndürme fonksiyonu
 
     HTTP 401 yanıtı döndürür.
 
