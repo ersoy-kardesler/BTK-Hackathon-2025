@@ -371,11 +371,14 @@ def login_page():
 
 
 @app.route("/register", methods=["GET"])
+@login_required
+@role_required("admin")
 def register_page():
     """
     Kayıt sayfası
     """
     return render_template("register.html")
+
 
 @app.route("/logout", methods=["GET"])
 def logout_page():
@@ -516,6 +519,8 @@ def auth_logout():
 
 
 @app.route("/auth/register", methods=["POST"])
+@login_required
+@role_required("admin")
 def auth_register():
     """
     Kullanıcı kayıt endpoint'i

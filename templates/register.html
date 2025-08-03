@@ -9,15 +9,16 @@
 <body>
     <main>
         <section class="container-wide">
-            <h1>Kayıt Ol</h1>
+            <h1>Yeni Kullanıcı Kaydet</h1>
             <form id="register-form" autocomplete="off">
                 <input type="text" id="username" name="username" placeholder="Kullanıcı Adı" required>
                 <input type="email" id="email" name="email" placeholder="E-posta" required>
                 <input type="password" id="password" name="password" placeholder="Şifre" required>
-                <button type="submit" class="btn">Kayıt Ol</button>
+                { % if current_user and current_user.role == 'admin' %}
+                    <button type="submit" class="btn">Kaydet</button>
+                {% endif %}
             </form>
             <div id="alert-area"></div>
-            <a href="{{ url_for('login_page') }}" class="btn" style="margin-top:24px;background:#888;">Giriş Yap</a>
             <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
         </section>
     </main>
@@ -43,7 +44,7 @@
             const data = await response.json();
             alertArea.innerHTML = '';
             if (response.ok && data.success) {
-                window.location.href = '/login';
+                window.location.href = '/';
             } else if (data && data.error) {
                 alertArea.innerHTML = `<div class='alert error'>${data.error}</div>`;
             } else {

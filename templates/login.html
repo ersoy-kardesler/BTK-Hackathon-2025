@@ -10,14 +10,17 @@
     <main>
         <section class="container-wide">
             <h1>Giriş Yap</h1>
-            <form id="login-form" autocomplete="off">
+            <form id="login-form" autocomplete="off" style="margin-bottom:12px;">
                 <input type="text" id="username" name="username" placeholder="Kullanıcı Adı" required>
                 <input type="password" id="password" name="password" placeholder="Şifre" required>
-                <button type="submit" class="btn">Giriş Yap</button>
+                <div class="button-group" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
+                    <button type="submit" class="btn" style="flex:1;min-width:160px;">Giriş Yap</button>
+                </div>
             </form>
             <div id="alert-area"></div>
-            <a href="{{ url_for('register_page') }}" class="btn" style="margin-top:24px;background:#888;">Kayıt Ol</a>
-            <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
+            <div class="button-group" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:24px;">
+                <a href="{{ url_for('index') }}" class="btn" style="flex:1;min-width:160px;background:#888;">Ana Sayfa</a>
+            </div>
         </section>
     </main>
     <script>

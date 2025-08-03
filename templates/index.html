@@ -11,15 +11,19 @@
         <h1>Eğitim Yönetim Sistemi</h1>
         <p>Yapay zeka destekli içerik üretimi ve değerlendirme aracı</p>
         <div class="button-group" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:12px;">
-            <a href="{{ url_for('education') }}" class="btn" style="flex:1;min-width:160px;">Eğitim Oluştur</a>
-            <a href="{{ url_for('assignment_evaluate') }}" class="btn" style="flex:1;min-width:160px;">Ödev Değerlendir</a>
-            <a href="{{ url_for('settings_page') }}" class="btn" style="flex:1;min-width:160px;">Ayarlar</a>
+            {% if current_user %}
+                <a href="{{ url_for('education') }}" class="btn" style="flex:1;min-width:160px;">Eğitim Oluştur</a>
+                <a href="{{ url_for('assignment_evaluate') }}" class="btn" style="flex:1;min-width:160px;">Ödev Değerlendir</a>
+                <a href="{{ url_for('settings_page') }}" class="btn" style="flex:1;min-width:160px;">Ayarlar</a>
+            {% endif %}
+            {% if current_user and current_user.role == 'admin' %}
+                <a href="{{ url_for('register_page') }}" class="btn" style="flex:1;min-width:160px;">Yeni Kullanıcı Kaydet</a>
+            {% endif %}
             {% if current_user %}
                 <a href="{{ url_for('logout_page') }}" class="btn" style="flex:1;min-width:160px;">Çıkış Yap</a>
             {% else %}
                 <a href="{{ url_for('login_page') }}" class="btn" style="flex:1;min-width:160px;">Giriş Yap</a>
             {% endif %}
-            <a href="{{ url_for('register_page') }}" class="btn" style="flex:1;min-width:160px;">Kayıt Ol</a>
         </div>
         <div class="about-section">
             <b>BTK Hackathon 2025</b> &ndash; Ersoy Kardeşler
