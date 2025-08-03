@@ -327,7 +327,7 @@ class UserAuth:
         email: str,
         password: str,
         full_name: str = None,
-        role: str = "student",
+        role: str = "normal",
     ) -> Tuple[bool, Optional[str]]:
         """
         Yeni kullanıcı kaydeder

@@ -24,10 +24,14 @@ Bu doküman, projeye eklenen veritabanı yapısı hakkında bilgi verir.
    - evaluation_result, score, evaluated_at
 
 5. **user_activity_logs** - Kullanıcı aktivite logları
+   - id, user_id, action, details, ip_address, user_agent, created_at
+
 6. **password_reset_tokens** - Şifre sıfırlama tokenları
+   - id, user_id, token, expires_at, created_at
+
 7. **api_keys** - API anahtarları
-   - user_id, key_name, api_key_encrypted
-   - is_active, created_at, last_used
+   - id, user_id, key_name, api_key_encrypted
+   - is_active, created_at, updated_at, last_used, usage_count
    - Not: API anahtarları kullanıcı bazında yönetilir. Sistem anahtarı sadece yedek/fallback olarak kullanılır.
 
 8. **user_settings** - Kullanıcı ayarları

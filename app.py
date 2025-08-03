@@ -48,6 +48,7 @@ from auth.flask_auth import (
 from config.config_loader import load_config, get_secret_key
 from database.database_connection import (
     init_database,
+    initialize_database_schema,
     get_db,
     get_system_config,
     get_user_settings,
@@ -112,13 +113,24 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 # Veritabanını başlat
 if not init_database():
     print("HATA: Veritabanı bağlantısı kurulamadı!")
-    print("Lütfen config.ini dosyasında veritabanı ayarlarını kontrol edin:")
-    print("- DB_HOST (varsayılan: localhost)")
-    print("- DB_PORT (varsayılan: 3306)")
-    print("- DB_USER (varsayılan: root)")
-    print("- DB_PASSWORD")
-    print("- DB_NAME (varsayılan: btk_hackathon_2025)")
-    exit(1)
+    print("Veritabanı şeması oluşturulmaya çalışılıyor...")
+    try:
+        if initialize_database_schema():
+            print("Veritabanı şeması başarıyla oluşturuldu. Uygulama yeniden başlatılıyor...")
+            if not init_database():
+                print("Yine de veritabanı bağlantısı kurulamadı! Lütfen config.ini dosyasında veritabanı ayarlarını kontrol edin:")
+                print("- DB_HOST (varsayılan: localhost)")
+                print("- DB_PORT (varsayılan: 3306)")
+                print("- DB_USER (varsayılan: root)")
+                print("- DB_PASSWORD")
+                print("- DB_NAME (varsayılan: btk_hackathon_2025)")
+                exit(1)
+        else:
+            print("Veritabanı şeması oluşturulamadı! Lütfen config.ini dosyasında veritabanı ayarlarını kontrol edin.")
+            exit(1)
+    except Exception as e:
+        print(f"Veritabanı şeması oluşturulurken hata oluştu: {e}")
+        exit(1)
 
 # Google Gemini API'yi yapılandır
 # Artık API anahtarı kullanıcı bazında alınacak, sistem başlangıcında genel API
@@ -365,6 +377,12 @@ def register_page():
     """
     return render_template("register.html")
 
+@app.route("/logout", methods=["GET"])
+def logout_page():
+    """
+    Çıkış sayfası
+    """
+    return render_template("logout.html")
 
 # =============== AUTH API ENDPOINTS ===============
 
@@ -390,7 +408,7 @@ def auth_login():
                 "username": "kullanici",
                 "email": "email@example.com",
                 "full_name": "Tam Ad",
-                "role": "student"
+                "role": "normal"
             },
             "session_token": "token_here"
         }
@@ -513,7 +531,7 @@ def auth_register():
         email = data.get("email", "").strip()
         password = data.get("password", "")
         full_name = data.get("full_name", "").strip()
-        role = data.get("role", "student").strip()
+        role = data.get("role", "normal").strip()
 
         # Validasyon
         if not username or not email or not password:
@@ -566,7 +584,7 @@ def auth_profile():
             "username": "kullanici",
             "email": "email@example.com",
             "full_name": "Tam Ad",
-            "role": "student"
+            "role": "normal"
         }
     }
     """
@@ -660,7 +678,7 @@ def auth_check_session():
             "user": {
                 "id": 1,
                 "username": "kullanici",
-                "role": "student"
+                "role": "normal"
             }
         }
     }
@@ -1283,7 +1301,7 @@ def api_admin_get_users():
     - page (int): Sayfa numarası (varsayılan: 1)
     - limit (int): Sayfa başına kayıt (varsayılan: 20, max: 100)
     - search (str): Arama terimi (username, email, full_name)
-    - role (str): Rol filtresi (student, admin)
+    - role (str): Rol filtresi (normal, admin)
     - is_active (bool): Aktiflik filtresi
 
     Response:
@@ -1323,7 +1341,7 @@ def api_admin_get_users():
             params.extend([search_term, search_term, search_term])
 
         # Rol filtresi
-        if role_filter in ["student", "admin"]:
+        if role_filter in ["normal", "admin"]:
             where_conditions.append("u.role = %s")
             params.append(role_filter)
 
@@ -1402,7 +1420,7 @@ def api_admin_create_user():
         "email": "email@example.com",
         "password": "sifre",
         "full_name": "Tam Ad",
-        "role": "student"  // student, admin
+        "role": "normal"  // normal, admin
     }
 
     Response:
@@ -1424,7 +1442,7 @@ def api_admin_create_user():
         email = data.get("email", "").strip()
         password = data.get("password", "")
         full_name = data.get("full_name", "").strip()
-        role = data.get("role", "student").strip()
+        role = data.get("role", "normal").strip()
 
         # Validasyon
         if not username or not email or not password:
@@ -1493,7 +1511,7 @@ def api_admin_update_user(user_id):
         "username": "yeni_kullanici_adi",  // isteğe bağlı
         "email": "yeni_email@example.com",  // isteğe bağlı
         "full_name": "Yeni Tam Ad",  // isteğe bağlı
-        "role": "student",  // isteğe bağlı
+        "role": "normal",  // isteğe bağlı
         "is_active": true,  // isteğe bağlı
         "password": "yeni_sifre"  // isteğe bağlı
     }
@@ -1576,7 +1594,7 @@ def api_admin_update_user(user_id):
         # Role
         if "role" in data:
             role = data["role"].strip()
-            if role not in ["student", "admin"]:
+            if role not in ["normal", "admin"]:
                 return jsonify({"success": False,
                                 "error": "Geçersiz rol değeri"}),
                 400

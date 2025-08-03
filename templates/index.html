@@ -15,9 +15,7 @@
             <a href="{{ url_for('assignment_evaluate') }}" class="btn" style="flex:1;min-width:160px;">Ödev Değerlendir</a>
             <a href="{{ url_for('settings_page') }}" class="btn" style="flex:1;min-width:160px;">Ayarlar</a>
             {% if current_user %}
-                <form action="{{ url_for('auth_logout') }}" method="post" style="display:inline;flex:1;min-width:160px;">
-                    <button type="submit" class="btn" style="width:100%;">Oturumu Kapat</button>
-                </form>
+                <a href="{{ url_for('logout_page') }}" class="btn" style="flex:1;min-width:160px;">Çıkış Yap</a>
             {% else %}
                 <a href="{{ url_for('login_page') }}" class="btn" style="flex:1;min-width:160px;">Giriş Yap</a>
             {% endif %}

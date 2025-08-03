@@ -2,7 +2,7 @@
 
 Bu doküman, projenin yapılandırma (config) adımlarını ve config.ini dosyasının nasıl hazırlanacağını açıklar.
 
-## 1. Konfigürasyon Dosyasını Oluşturma
+## Konfigürasyon Dosyasını Oluşturma
 
 1. `config/config.ini.example` dosyasını `config/config.ini` olarak kopyalayın:
    ```bash
@@ -10,38 +10,44 @@ Bu doküman, projenin yapılandırma (config) adımlarını ve config.ini dosyas
    ```
 2. `config/config.ini` dosyasını bir metin düzenleyici ile açın ve aşağıdaki alanları doldurun:
 
-### config.ini Örneği
+## config.ini Örneği
 ```ini
-[database]
-DB_HOST = localhost
-DB_PORT = 3306
-DB_USER = root
-DB_PASSWORD = your_password_here
-DB_NAME = btk_hackathon_2025
-DB_CHARSET = utf8mb4
-DB_COLLATION = utf8mb4_unicode_ci
-
-[security]
-SECRET_KEY = your_secret_key_here
+[flask]
+secret_key = secret-key
 
 [app]
-DEBUG = False
-HOST = 127.0.0.1
-PORT = 5000
+debug = True
+host = 0.0.0.0
+port = 5000
+
+[database]
+db_host = localhost
+db_port = 3306
+db_user = root
+db_password = database_password
+db_name = btk_hackathon_2025
+db_charset = utf8mb4
+db_collation = utf8mb4_unicode_ci
+
+[security]
+session_cookie_secure = True
+session_cookie_httponly = True
+permanent_session_lifetime = 3600
+
 ```
 
 - `DB_PASSWORD`: MariaDB/MySQL root şifrenizi girin.
 - `SECRET_KEY`: Flask için güçlü bir gizli anahtar oluşturun.
 - Diğer alanları ihtiyaca göre düzenleyebilirsiniz.
 
-## 2. Yapılandırma Yükleyici
+## Yapılandırma Yükleyici
 
 - `config/config_loader.py` dosyası, `config.ini` dosyasını okuyarak uygulama ayarlarını yükler.
 - Dosya yoksa veya eksikse, varsayılan ayarlarla çalışır.
 - Sistem ve kullanıcı bazında API anahtarı yönetimi kodda desteklenmektedir. Sistem anahtarı sadece fallback olarak kullanılır.
 - Flask session ayarları ve güvenlik anahtarı kodda detaylandırılmıştır.
 
-## 3. Sık Karşılaşılan Sorunlar
+## Sık Karşılaşılan Sorunlar
 
 - `config.ini` eksik veya hatalıysa uygulama başlatılamaz ya da varsayılan ayarlarla çalışır.
 - `DB_PASSWORD` veya `SECRET_KEY` gibi alanlar boş bırakılırsa güvenlik riski oluşur.

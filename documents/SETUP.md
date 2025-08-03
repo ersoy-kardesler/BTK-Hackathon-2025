@@ -38,15 +38,7 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
    - Root şifresi belirleyin.
    - Varsayılan ayarları takip edin (örneğin, anonim kullanıcıları kaldırın, test veritabanını silin).
 
-3. **MariaDB Güvenlik Ayarlarını Yapılandırın**
-
-   ```bash
-   sudo mysql_secure_installation
-   ```
-   - Root şifresi belirleyin.
-   - Varsayılan ayarları takip edin (örneğin, anonim kullanıcıları kaldırın, test veritabanını silin).
-
-## Kurulum Adımları
+# Kurulum Adımları
 
 1. **Depoyu Klonlayın**
 
@@ -75,20 +67,6 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
    ```bash
    pip install -r requirements.txt
    ```
-
-4. **Veritabanını Ayarlayın**
-
-
-   - Şema dosyasını veritabanına uygulayın:
-     ```bash
-     mysql -u root -p btk_hackathon_2025 < database/database_schema.sql
-     ```
-     Eğer ayrı bir kullanıcı oluşturduysanız:
-     ```bash
-     mysql -u kullanıcı_adı -p btk_hackathon_2025 < database/database_schema.sql
-     ```
-
-   > Bu komut, `database/database_schema.sql` dosyasındaki veritabanı şemasını `btk_hackathon_2025` veritabanına uygular ve gerekli tabloları oluşturur. Komutu çalıştırmadan önce veritabanının oluşturulmuş olması gerekmektedir.
 
 5. **Yapılandırmayı Düzenleyin**
 
@@ -135,13 +113,13 @@ Bu doküman, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
      python app.py
      ```
 
-6. **Tarayıcıda Açın**
+7. **Tarayıcıda Açın**
 
    - Uygulama varsayılan olarak `http://127.0.0.1:5000` adresinde çalışacaktır.
 
 ---
 
-## Kurulumun Doğrulanması
+# Kurulumun Doğrulanması
 
 Kurulumdan sonra aşağıdaki adımları izleyerek uygulamanın doğru çalıştığını test edebilirsiniz:
 
@@ -151,7 +129,7 @@ Kurulumdan sonra aşağıdaki adımları izleyerek uygulamanın doğru çalışt
 
 ---
 
-## Ek Notlar ve Öneriler
+# Ek Notlar ve Öneriler
 
 - Geliştirme ortamında çalışıyorsanız `DEBUG = True` bırakabilirsiniz, canlı ortamda mutlaka `False` yapın.
 - MariaDB yerine MySQL de kullanılabilir, ancak şema ve bağlantı ayarlarını kontrol edin.
