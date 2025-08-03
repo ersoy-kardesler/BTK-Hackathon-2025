@@ -8,11 +8,9 @@ Bu proje, Google Gemini AI ile eğitim içerikleri oluşturabilen bir Flask web 
 
 ## Özellikler
 - Eğitim içeriği oluşturma (Google Gemini AI ile)
-- Ödev değerlendirme
+- Ödev değerlendirme (Google Gemini AI ile)
 - Kullanıcı kimlik doğrulama ve oturum yönetimi (MariaDB)
-- Kullanıcı bazında API anahtarı yönetimi
-- Kullanıcı ayarları ve favori içerik yönetimi
-- Admin paneli ve kullanıcı yönetimi
+- Admin paneli ve kullanıcı ayarları yönetimi
 
 ## Belgeler
 
