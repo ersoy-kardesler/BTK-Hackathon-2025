@@ -29,6 +29,16 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+# Fernet anahtarı ve şifreleme yardımcıları
+FERNET_KEY = os.environ.get("FERNET_KEY") or b"QWl2Y2ZzZ2ZzZ2ZzZ2ZzZ2ZzZ2ZzZ2ZzZ2ZzZ2ZzZ2c="  # Fernet.generate_key() ile üretilen bir örnek anahtar
+fernet = Fernet(FERNET_KEY)
+
+def mask_api_key(api_key: str) -> str:
+    if not api_key or len(api_key) < 8:
+        return ""
+    return api_key[:6] + "..." + api_key[-4:]
+
+
 # Veri tabanı bağlantı sınıfı
 class DatabaseConnection:
     """MariaDB veri tabanı bağlantı sınıfı"""
@@ -574,7 +584,7 @@ def initialize_database_schema():
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
             INDEX idx_token (token),
             INDEX idx_user_id (user_id),
-            INDEX idx_expires_at (expires_at)W
+            INDEX idx_expires_at (expires_at)
         ) ENGINE=InnoDB CHARACTER SET {db_charset} COLLATE {db_collation};
 
         CREATE TABLE IF NOT EXISTS api_keys (
@@ -853,21 +863,31 @@ def get_user_settings(user_id: int) -> Optional[Dict]:
                 FROM user_settings WHERE user_id = %s""",
             (user_id,),
         )
-
         if result:
+            api_key = result["gemini_api_key"]
+            if api_key:
+                try:
+                    api_key_decrypted = fernet.decrypt(api_key.encode()).decode()
+                    api_key_masked = mask_api_key(api_key_decrypted)
+                except Exception:
+                    api_key_decrypted = None
+                    api_key_masked = None
+            else:
+                api_key_decrypted = None
+                api_key_masked = None
             return {
-                "gemini_api_key": result["gemini_api_key"],
+                "gemini_api_key": api_key_decrypted,
+                "gemini_api_key_masked": api_key_masked,
                 "gemini_model": result["gemini_model"],
                 "dark_mode": bool(result["dark_mode"]),
             }
         else:
-            # Varsayılan ayarları döndür
             return {
                 "gemini_api_key": None,
+                "gemini_api_key_masked": None,
                 "gemini_model": "gemini-2.5-flash",
                 "dark_mode": False,
             }
-
     except Exception as e:
         logger.error(f"Kullanıcı ayarları alma hatası: {e}")
         return None
@@ -884,24 +904,41 @@ def save_user_settings(
     Kullanıcının ayarlarını güvenli şekilde kaydetme fonksiyonu
     """
     try:
-        allowed_fields = {
-            "gemini_api_key": (gemini_api_key, "gemini_api_key = %s"),
-            "gemini_model": (gemini_model, "gemini_model = %s"),
-            "dark_mode": (dark_mode, "dark_mode = %s"),
-        }
-        fields = []
-        params = []
-        for key, (value, sql) in allowed_fields.items():
-            if value is not None:
-                fields.append(sql)
-                params.append(value)
-        if not fields:
-            return False
-        fields.append("updated_at = CURRENT_TIMESTAMP")
-        query = f"UPDATE user_settings SET {', '.join(fields)} WHERE user_id = %s"
-        params.append(user_id)
         db = get_db()
-        db.execute_update(query, tuple(params))
+        # Şifreleme
+        encrypted_api_key = None
+        if gemini_api_key:
+            encrypted_api_key = fernet.encrypt(gemini_api_key.encode()).decode()
+        # Kayıt var mı kontrol et
+        existing = db.fetch_one(
+            "SELECT user_id FROM user_settings WHERE user_id = %s", (user_id,)
+        )
+        if existing:
+            allowed_fields = {
+                "gemini_api_key": (encrypted_api_key, "gemini_api_key = %s"),
+                "gemini_model": (gemini_model, "gemini_model = %s"),
+                "dark_mode": (dark_mode, "dark_mode = %s"),
+            }
+            fields = []
+            params = []
+            for key, (value, sql) in allowed_fields.items():
+                if value is not None:
+                    fields.append(sql)
+                    params.append(value)
+            if not fields:
+                return False
+            fields.append("updated_at = CURRENT_TIMESTAMP")
+            query = f"UPDATE user_settings SET {', '.join(fields)} WHERE user_id = %s"
+            params.append(user_id)
+            db.execute_update(query, tuple(params))
+        else:
+            query = "INSERT INTO user_settings (user_id, gemini_api_key, gemini_model, dark_mode) VALUES (%s, %s, %s, %s)"
+            db.execute_insert(query, (
+                user_id,
+                encrypted_api_key,
+                gemini_model or "gemini-2.5-flash",
+                dark_mode if dark_mode is not None else False,
+            ))
         return True
     except Exception as e:
         logger.error(f"Kullanıcı ayarları kaydetme hatası: {e}")
@@ -925,17 +962,16 @@ def get_user_gemini_api_key(user_id: int) -> Optional[str]:
     try:
         # Önce kullanıcının kendi anahtarını denetle
         result = db.fetch_one(
-            "SELECT gemini_api_key FROM user_settings "
-            "WHERE user_id = %s AND gemini_api_key IS NOT NULL",
+            "SELECT gemini_api_key FROM user_settings WHERE user_id = %s AND gemini_api_key IS NOT NULL",
             (user_id,),
         )
 
         if result and result["gemini_api_key"]:
-            return result["gemini_api_key"]
-
-        # Kullanıcının anahtarı yoksa sistem anahtarını al
+            try:
+                return fernet.decrypt(result["gemini_api_key"].encode()).decode()
+            except Exception:
+                return None
         return get_system_config("GEMINI_API_KEY")
-
     except Exception as e:
         logger.error(f"Kullanıcı Gemini API anahtarı alma hatası: {e}")
         return None
