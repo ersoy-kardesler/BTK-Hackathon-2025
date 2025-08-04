@@ -95,10 +95,8 @@ app.config.update(config)
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(
     hours=int(config.get("SESSION_LIFETIME_HOURS", 24))
 )
-app.config["SESSION_COOKIE_SECURE"] = config.get("SESSION_COOKIE_SECURE",
-                                                 "False").lower() == "true"
-app.config["SESSION_COOKIE_HTTPONLY"] = config.get("SESSION_COOKIE_HTTPONLY",
-                                                   "True").lower() == "true"
+app.config["SESSION_COOKIE_SECURE"] = str(config.get("SESSION_COOKIE_SECURE", "False")).lower() == "true"
+app.config["SESSION_COOKIE_HTTPONLY"] = str(config.get("SESSION_COOKIE_HTTPONLY", "True")).lower() == "true"
 
 # Veri tabanını başlat
 if not init_database():
