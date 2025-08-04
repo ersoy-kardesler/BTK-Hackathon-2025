@@ -21,11 +21,11 @@ def evaluate_assignment(
     ...
     """
     if not assignment_text.strip():
-        return "Hata: Ödev metni boş olamaz. " \
-               "Lütfen değerlendirilecek içeriği girin."
+        return "Hata: Ödev metni boş olamaz! " \
+               "Lütfen değerlendirilecek içeriği giriniz."
     if len(assignment_text) < 10:
         return (
-            "Uyarı: Çok kısa ödev metni."
+            "Uyarı: Çok kısa ödev metni! "
             "Detaylı değerlendirme için daha uzun içerik önerilir."
         )
 

@@ -1,5 +1,6 @@
 {% extends 'template.html' %}
 {% block content %}
+<body{% if current_user and current_user.settings and current_user.settings.dark_mode %} class="dark-mode"{% endif %}>
     <main>
         <section class="container-wide">
             <h1>Eğitim Oluşturma</h1>
@@ -7,11 +8,13 @@
             <form id="education-form" autocomplete="off">
                 <label for="subject">Ders Adı</label>
                 <input type="text" id="subject" name="subject" placeholder="Ders Adı (örnek: Python Programlama)" required>
-                <button id="generate-btn" class="btn" type="submit">Eğitim Oluştur</button>
+                <div class="button-group" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:12px;">
+                    <button id="generate-btn" class="btn" type="submit" style="flex:1;min-width:160px;">Eğitim Oluştur</button>
+                    <a href="{{ url_for('index') }}" class="btn" style="flex:1;min-width:160px;background:#888;">Ana Sayfa</a>
+                </div>
             </form>
             <div id="alert-area"></div>
             <section id="education-result" style="margin-top:24px;"></section>
-            <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
         </section>
     </main>
     <script>
@@ -48,4 +51,5 @@
         }
     });
     </script>
+</body>
 {% endblock %}

@@ -1,5 +1,6 @@
 {% extends 'template.html' %}
 {% block content %}
+<body{% if current_user and current_user.settings and current_user.settings.dark_mode %} class="dark-mode"{% endif %}>
     <main>
         <section class="container-wide">
             <h1>Kullanıcı Ayarları</h1>
@@ -12,17 +13,17 @@
                     <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                     <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
                 </select>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:18px;">
+                <div style="display:flex;flex-direction:row;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:18px;">
                     <input type="checkbox" id="dark_mode" name="dark_mode" style="width:18px;height:18px;margin:0;">
                     <label for="dark_mode" style="margin:0;color:var(--primary-blue);font-weight:500;cursor:pointer;">Koyu Mod</label>
                 </div>
-                <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:8px;">
+                <div style="display:flex;flex-direction:row;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:8px;">
                     <button type="submit" class="btn" style="flex:1;min-width:160px;">Ayarları Kaydet</button>
                     <button type="button" id="test-api-key" class="btn" style="background:#888;flex:1;min-width:160px;">API Anahtarını Test Et</button>
+                    <a href="{{ url_for('index') }}" class="btn" style="flex:1;min-width:160px;background:#888;">Ana Sayfa</a>
                 </div>
             </form>
             <div id="alert-area"></div>
-            <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
         </section>
     </main>
     <script>
@@ -99,4 +100,5 @@
         }
     });
     </script>
+</body>
 {% endblock %}

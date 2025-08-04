@@ -1,6 +1,7 @@
 {% extends 'template.html' %}
 {% block content %}
-    <h1>Logging out...</h1>
+<body>
+    <h1>Oturumdan çıkılıyor...</h1>
     <script>
         fetch('/auth/logout', {
             method: 'POST',
@@ -10,14 +11,15 @@
             if (response.ok) {
                 window.location.href = '/login';
             } else {
-                alert('Logout failed.');
+                alert('Oturum kapatılamadı!');
             }
         })
         .catch(error => {
-            alert('An error occurred during logout.');
+            alert('Oturum kapatma sırasında hata oluştu!');
         });
         setTimeout(() => {
             window.location.href = '/';
         }, 3000);
     </script>
+</body>
 {% endblock %}

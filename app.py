@@ -160,8 +160,9 @@ def index():
         - Static dosyalar (CSS, JS) otomatik olarak yüklenir
         - İsteğe bağlı kimlik doğrulama desteklenir
     """
-    # Kullanıcı bilgilerini taslağa gönder
     current_user = get_current_user_safe()
+    if current_user:
+        current_user['settings'] = get_user_settings(current_user['user_id'])
     return render_template("index.html", current_user=current_user)
 
 
@@ -173,6 +174,7 @@ def education():
     Eğitim oluşturma sayfası - Formu gösterir.
     Giriş yapmış kullanıcılar gereklidir.
     """
+    g.current_user['settings'] = get_user_settings(g.current_user['user_id'])
     return render_template("education.html", current_user=g.current_user)
 
 
@@ -184,8 +186,8 @@ def assignment_evaluate():
     Ödev değerlendirme sayfası - Formu gösterir.
     Giriş yapmış kullanıcılar gereklidir.
     """
-    return render_template("assignment_evaluate.html",
-                           current_user=g.current_user)
+    g.current_user['settings'] = get_user_settings(g.current_user['user_id'])
+    return render_template("assignment_evaluate.html", current_user=g.current_user)
 
 
 # Eğitim oluşturma yönlendirmesi
@@ -368,7 +370,8 @@ def register_page():
     """
     Kullanıcı kaydı sayfası fonksiyonu
     """
-    return render_template("register.html")
+    g.current_user['settings'] = get_user_settings(g.current_user['user_id'])
+    return render_template("register.html", current_user=g.current_user)
 
 
 # Kullanıcı çıkışı sayfası yönlendirmesi
@@ -600,8 +603,7 @@ def auth_profile():
 
     except Exception as e:
         logger.error(f"Profil endpoint hatası: {e}")
-        return jsonify({"success": False,
-                        "error": "Profil bilgileri alınamadı"}),
+        return jsonify({"success": False, "error": "Profil bilgileri alınamadı"}),
         500
 
 
@@ -1025,6 +1027,7 @@ def settings_page():
     """
     Kullanıcı ayarları sayfası fonksiyonu
     """
+    g.current_user['settings'] = get_user_settings(g.current_user['user_id'])
     return render_template("settings.html", current_user=g.current_user)
 
 
@@ -1106,10 +1109,17 @@ def api_save_settings():
         gemini_model = data.get("gemini_model")
         dark_mode = data.get("dark_mode")
 
-        # API anahtarı varsa basit validasyon
+        # API anahtarının olup olmadığını kontrol et
         if gemini_api_key is not None:
             gemini_api_key = gemini_api_key.strip()
-            if gemini_api_key and not \
+            if gemini_api_key == "":
+                # Kullanıcıda anahtar kayıtlı mı kontrol et
+                existing_key = get_user_gemini_api_key(g.current_user["user_id"])
+                if not existing_key:
+                    return jsonify({"success": False,
+                                    "error": "API anahtarı boş bırakılamaz!"}), 400
+                gemini_api_key = None  # Eski anahtar korunacak
+            elif gemini_api_key and not \
                gemini_api_key.startswith(("AIza", "sk-")):
                 return (
                     jsonify(

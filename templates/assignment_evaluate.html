@@ -1,5 +1,6 @@
 {% extends 'template.html' %}
 {% block content %}
+<body{% if current_user and current_user.settings and current_user.settings.dark_mode %} class="dark-mode"{% endif %}>
     <main>
         <section class="container-wide">
             <h1>Ödev Değerlendirme</h1>
@@ -7,11 +8,13 @@
             <form id="assignment-form" autocomplete="off">
                 <textarea name="assignment_text" id="assignment_text" placeholder="Ödev metnini girin" required style="height:100px;"></textarea>
                 <input type="text" name="criteria" id="criteria" placeholder="Değerlendirme kriteri (örn: Anlatım, içerik, özgünlük...)" required>
-                <button type="submit" class="btn">Ödevi Değerlendir</button>
+                <div class="button-group" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:12px;">
+                    <button type="submit" class="btn" style="flex:1;min-width:160px;">Ödevi Değerlendir</button>
+                    <a href="{{ url_for('index') }}" class="btn" style="flex:1;min-width:160px;background:#888;">Ana Sayfa</a>
+                </div>
             </form>
             <div id="alert-area"></div>
             <div id="evaluation-result" style="margin-top:24px;"></div>
-            <a href="{{ url_for('index') }}" class="btn" style="margin-top:24px;background:#888;">Ana Sayfa</a>
         </section>
     </main>
     <script>
@@ -37,7 +40,7 @@
             const data = await response.json();
             alertArea.innerHTML = '';
             if (response.ok && data.success && data.evaluation) {
-                resultDiv.innerHTML = `<div class='alert success'>Değerlendirme Sonucu:</div><pre style='text-align:left;white-space:pre-wrap;background:#f8faff;padding:16px;border-radius:8px;'>${data.evaluation.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
+                resultDiv.innerHTML = `<div class='alert success'>Değerlendirme Sonucu:</div><pre class='result-box'>${data.evaluation.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
             } else if (data && data.error) {
                 alertArea.innerHTML = `<div class='alert error'>Veri alındı ama hata oluştu: ${data.error}</div>`;
             } else {
@@ -48,4 +51,5 @@
         }
     });
     </script>
+</body>
 {% endblock %}

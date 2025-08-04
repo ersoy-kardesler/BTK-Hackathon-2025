@@ -1,5 +1,6 @@
 {% extends 'template.html' %}
 {% block content %}
+<body{% if current_user and current_user.settings and current_user.settings.dark_mode %} class="dark-mode"{% endif %}>
     <div class="container">
         <h1>Eğitim Yönetim Sistemi</h1>
         <p>Yapay zeka destekli içerik üretimi ve değerlendirme aracı</p>
@@ -22,4 +23,5 @@
             <b>BTK Hackathon 2025</b> &ndash; Ersoy Kardeşler
         </div>
     </div>
+</body>
 {% endblock %}
