@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ödev Değerlendir</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+{% extends 'template.html' %}
+{% block content %}
     <main>
         <section class="container-wide">
             <h1>Ödev Değerlendirme</h1>
@@ -55,5 +48,4 @@
         }
     });
     </script>
-</body>
-</html>
+{% endblock %}

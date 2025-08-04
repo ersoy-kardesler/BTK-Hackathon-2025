@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kayıt Ol</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+{% extends 'template.html' %}
+{% block content %}
     <main>
         <section class="container-wide">
             <h1>Yeni Kullanıcı Kaydet</h1>
@@ -14,7 +7,7 @@
                 <input type="text" id="username" name="username" placeholder="Kullanıcı Adı" required>
                 <input type="email" id="email" name="email" placeholder="E-posta" required>
                 <input type="password" id="password" name="password" placeholder="Şifre" required>
-                { % if current_user and current_user.role == 'admin' %}
+                {% if current_user and current_user.role == 'admin' %}
                     <button type="submit" class="btn">Kaydet</button>
                 {% endif %}
             </form>
@@ -55,5 +48,4 @@
         }
     });
     </script>
-</body>
-</html>
+{% endblock %}

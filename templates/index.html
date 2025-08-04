@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eğitim Yönetim Sistemi</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+{% extends 'template.html' %}
+{% block content %}
     <div class="container">
         <h1>Eğitim Yönetim Sistemi</h1>
         <p>Yapay zeka destekli içerik üretimi ve değerlendirme aracı</p>
@@ -29,5 +22,4 @@
             <b>BTK Hackathon 2025</b> &ndash; Ersoy Kardeşler
         </div>
     </div>
-</body>
-</html>
+{% endblock %}
