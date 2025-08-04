@@ -881,70 +881,28 @@ def save_user_settings(
     dark_mode: bool = None,
 ) -> bool:
     """
-    Kullanıcının ayarlarını kaydetme fonksiyonu
-
-    Parametreler:
-        user_id (int): Kullanıcı ID'si
-        gemini_api_key (str, optional): Gemini API anahtarı
-        gemini_model (str, optional): Gemini model adı
-        dark_mode (bool, optional): Gece modu durumu
-
-    Döndürülenler:
-        bool: İşlem başarılıysa True, değilse False
+    Kullanıcının ayarlarını güvenli şekilde kaydetme fonksiyonu
     """
     try:
-        # Önce mevcut kaydı denetle
-        existing = db.fetch_one(
-            "SELECT id FROM user_settings WHERE user_id = %s", (user_id,)
-        )
-
-        if existing:
-            # Sadece gönderilen alanları güncelle
-            update_fields = []
-            params = []
-
-            if gemini_api_key is not None:
-                update_fields.append("gemini_api_key = %s")
-                params.append(gemini_api_key)
-
-            if gemini_model is not None:
-                update_fields.append("gemini_model = %s")
-                params.append(gemini_model)
-
-            if dark_mode is not None:
-                update_fields.append("dark_mode = %s")
-                params.append(dark_mode)
-
-            if update_fields:
-                update_fields.append("updated_at = NOW()")
-                query = f"UPDATE user_settings SET {', '.join(update_fields)}"
-                "WHERE user_id = %s"
-                params.append(user_id)
-                affected = db.execute_update(query, tuple(params))
-                success = affected > 0
-            else:
-                # Hiçbir alan güncellenmedi ama başarılı sayalım
-                success = True
-        else:
-            # Yeni kayıt ekle
-            query = (
-                "INSERT INTO user_settings (user_id, gemini_api_key, "
-                "gemini_model, dark_mode) VALUES (%s, %s, %s, %s)"
-            )
-            params = (
-                user_id,
-                gemini_api_key if gemini_api_key is not None
-                else None,
-                gemini_model if gemini_model is not None
-                else "gemini-2.5-flash",
-                dark_mode if dark_mode is not None
-                else False,
-            )
-            inserted_id = db.execute_insert(query, params)
-            success = inserted_id is not None and inserted_id > 0
-
-        return success
-
+        allowed_fields = {
+            "gemini_api_key": (gemini_api_key, "gemini_api_key = %s"),
+            "gemini_model": (gemini_model, "gemini_model = %s"),
+            "dark_mode": (dark_mode, "dark_mode = %s"),
+        }
+        fields = []
+        params = []
+        for key, (value, sql) in allowed_fields.items():
+            if value is not None:
+                fields.append(sql)
+                params.append(value)
+        if not fields:
+            return False
+        fields.append("updated_at = CURRENT_TIMESTAMP")
+        query = f"UPDATE user_settings SET {', '.join(fields)} WHERE user_id = %s"
+        params.append(user_id)
+        db = get_db()
+        db.execute_update(query, tuple(params))
+        return True
     except Exception as e:
         logger.error(f"Kullanıcı ayarları kaydetme hatası: {e}")
         return False
