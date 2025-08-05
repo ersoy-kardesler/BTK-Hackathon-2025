@@ -52,8 +52,8 @@ Bu belge, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
 2. **Sanal Ortam Oluşturun ve Aktif Edin**
 
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate
+   python3 -m venv .venv
+   source .venv/bin/activate
    ```
 
    - **Windows için:**
@@ -78,20 +78,7 @@ Bu belge, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
      ```bash
      nano config/config.ini
      ```
-   - Aşağıdaki veri tabanı ayarlarını yapılandırın:
-     ```ini
-     [database]
-     DB_HOST = localhost
-     DB_PORT = 3306
-     DB_USER = root
-     DB_PASSWORD = your_password_here
-     DB_NAME = btk_hackathon_2025
-     DB_CHARSET = utf8mb4
-     DB_COLLATION = utf8mb4_unicode_ci
-
-     [app]
-     SECRET_KEY = buraya_güçlü_bir_anahtar_girin
-     DEBUG = True
+   - Yapılandırma dosyanızı seçeneklerinize göre düzenleyin.
 
    - **Önemli Yapılandırma Notları:**
      - `DB_PASSWORD`: MariaDB yönetici kullanıcısı (root) parolanızı veya oluşturduğunuz kullanıcının parolasını girin
@@ -105,7 +92,7 @@ Bu belge, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
 6. **Uygulamayı Çalıştırın**
 
    ```bash
-   python app.py
+   python3 app.py
    ```
 
    - **Windows için:**
@@ -116,6 +103,7 @@ Bu belge, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
 7. **Tarayıcıda Açın**
 
    - Uygulama varsayılan olarak `http://127.0.0.1:5000` adresinde çalışacaktır.
+   - Yapılandırmayı değiştirdiyseniz farklı adres ve port bilgilerinde çalışabilir.
 
 ---
 
@@ -123,7 +111,7 @@ Bu belge, yazılımın nasıl kurulacağını adım adım açıklamaktadır.
 
 Kurulumdan sonra aşağıdaki adımları izleyerek uygulamanın doğru çalıştığını sınayabilirisiniz:
 
-1. Web tarayıcınızda `http://127.0.0.1:5000` adresine gidin ve ana sayfanın açıldığını doğrulayın.
+1. Web tarayıcınızda uygulamanın HTTP adresine gidin ve ana sayfanın açıldığını doğrulayın.
 2. Hatalarla karşılaşırsanız terminaldeki hata iletilerini inceleyin.
 3. Gerekirse `config/config.ini` ve veri tabanı ayarlarını tekrar kontrol edin.
 
