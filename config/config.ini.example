@@ -13,12 +13,12 @@ port = 5000
 db_host = localhost
 db_port = 3306
 db_user = root
-db_password = database_password
+db_password = database-password
 db_name = btk_hackathon_2025
 db_charset = utf8mb4
 db_collation = utf8mb4_unicode_ci
 
 [security]
-session_cookie_secure = False
+session_cookie_secure = True
 session_cookie_httponly = True
 permanent_session_lifetime = 3600
