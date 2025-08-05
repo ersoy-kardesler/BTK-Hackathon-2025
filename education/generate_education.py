@@ -11,9 +11,9 @@ Bu dosya, Gemini API kullanarak eğitim oluşturmayı sınar.
 # Eğitimi oluşturan fonksiyon
 def generate_education(
     subject,
-    duration="14 hafta",
-    lesson_duration=60,
-    question_count=10,
+    duration="5 hafta",
+    lesson_duration=30,
+    question_count=5,
     model=None
 ):
     """
