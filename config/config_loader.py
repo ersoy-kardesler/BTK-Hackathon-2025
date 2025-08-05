@@ -1,8 +1,8 @@
 """
 BTK Hackathon 2025 - MariaDB Bağlantı Modülü
 
-Telif Hakkı © 2025 Ersoy Kardeşler
-Bütün hakları saklıdır.
+Telif Hakkı © 2025 Ercan Ersoy, Erdem Ersoy
+Tüm hakları saklıdır.
 
 Bu modül config.ini dosyasını okuyarak uygulama yapılandırmalarını yükler.
 """

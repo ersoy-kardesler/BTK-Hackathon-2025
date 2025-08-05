@@ -1,8 +1,8 @@
 """
 BTK Hackathon 2025 - Ödev Değerlendirme Sınama Uygulaması
 
-Telif Hakkı © 2025 Ersoy Kardeşler
-Bütün hakları saklıdır.
+Telif Hakkı © 2025 Ercan Ersoy, Erdem Ersoy
+Tüm hakları saklıdır.
 
 Bu dosya, ödev değerlendirme işlevini sınar.
 """

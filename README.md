@@ -23,6 +23,6 @@ Tüm teknik detaylar ve kullanım örnekleri için ilgili belge dosyalarına bak
 
 ## Lisans
 
-Telif Hakkı © 2025 Ersoy Kardeşler
+Telif Hakkı © 2025 Ercan Ersoy, Erdem Ersoy
 
 Tüm hakları saklıdır.

@@ -1,8 +1,8 @@
 """
 BTK Hackathon 2025 - Gemini API ile Eğitim Oluşturma Kaynak Kodları
 
-Telif Hakkı © 2025 Ersoy Kardeşler
-Bütün hakları saklıdır.
+Telif Hakkı © 2025 Ercan Ersoy, Erdem Ersoy
+Tüm hakları saklıdır.
 
 Bu dosya, Gemini API kullanarak ödev değerlendirir.
 """
