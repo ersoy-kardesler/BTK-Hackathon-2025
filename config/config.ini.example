@@ -5,7 +5,7 @@
 secret_key = secret-key
 
 [app]
-debug = True
+debug = False
 host = 0.0.0.0
 port = 5000
 
@@ -19,6 +19,6 @@ db_charset = utf8mb4
 db_collation = utf8mb4_unicode_ci
 
 [security]
-session_cookie_secure = True
+session_cookie_secure = False
 session_cookie_httponly = True
 permanent_session_lifetime = 3600

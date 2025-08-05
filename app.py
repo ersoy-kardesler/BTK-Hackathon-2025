@@ -10,6 +10,7 @@ Bu uygulama, Google Gemini AI ile eğitim içeriği oluşturma ve
 
 
 # Gerekli kütüphanelerin içe aktarılması
+import bcrypt
 import re
 import logging
 import google.generativeai as genai
@@ -118,8 +119,8 @@ if not init_database():
                 exit(1)
         else:
             print("Veri tabanı şeması oluşturulamadı!")
-            print("Lütfen config.ini dosyasında"
-                  "veri tabanı ayarlarını kontrol edin.")
+            print("Lütfen config.ini dosyasında")
+            print("veri tabanı ayarlarını kontrol edin.")
 
             exit(1)
     except Exception as e:
@@ -1560,7 +1561,6 @@ def api_admin_update_user(user_id):
             password = data["password"]
             if password:
                 # Şifreyi hash'le
-                import bcrypt
                 hashed_password = bcrypt.hashpw(password.encode('utf-8'),
                                                 bcrypt.gensalt())
                 update_fields.append("password_hash = %s")
