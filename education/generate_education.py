@@ -33,18 +33,15 @@ bir eğitim oluştur. Müfredat şu şekilde olmalı:
 kadar sıralama)
 3. Her ders için haftalık konular ve
 alt başlıklar (Kronolojik sıralama)
-4. Pratik projeler (Uygulamalı öğrenme için)
-5. Değerlendirme kriterleri (Tarafsız ölçüm yöntemleri)
-6. Kaynaklar (Kitap, video, çevrimiçi platform önerileri)
+4. Kaynaklar (Kitap, video, çevrimiçi platform önerileri)
 
 Ayrıca, aşağıdaki içerikleri de oluştur:
 
-    1. Ders Hedefleri
+    1. Ders Başlıkları
     2. Giriş (%5)
-    3. Ana İçerik (%50)
-    4. Pratik Uygulamalar (%40)
+    3. Ana İçerik (%70)
+    4. Pratik Uygulamalar (%30)
     5. Değerlendirme ve Kapanış (%5)
-    6. Ödev/Öneriler
 
 Tüm içerikleri Türkçe olarak, ayrıntılı ve düzenli bir biçimde
 hazırla.
